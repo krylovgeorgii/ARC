@@ -9,26 +9,16 @@
  */
 
 #ifndef _ROBOT_CPP_
-#define _ROBOT_CPP_ "1.6"
+#define _ROBOT_CPP_ "1.8"
 
-#include "config.h"
+#include "robot.h"
+#include "button.h"
+#include "log.h"
+#include "time.h"
 
 static constexpr double PI = 3.1415926535;
 
 extern NiFpga_Session myrio_session;
-
-bool wait(const double waitTime, const bool reactSignal) {
-	if (reactSignal) {
-		return usleep(waitTime * 1000000);
-	}
-
-	double oldTime = time();
-	do {
-		usleep(waitTime * 1000000);
-	} while (time() - oldTime < waitTime);
-
-	return false;
-}
 
 NiFpga_Status robot::start(int argc, char **argv, char *argh) {
 	if(robot::log.cleanLogFile) {
@@ -90,6 +80,8 @@ NiFpga_Status robot::start(int argc, char **argv, char *argh) {
 		}
 	}
 
+	robot::button::setupButton();
+
 	return status;
 }
 
@@ -121,7 +113,7 @@ robot::Pwm::Pwm(const Pin pwm_pin, int startPwm, const uint16_t frequency_divide
 			pwm.cntr = PWMA_0CNTR;
 			reg = 2;
 			break;
-			
+
 		case Pin::PWM_A1:
 			pwm.cnfg = PWMA_1CNFG;
 			pwm.cs = PWMA_1CS;
@@ -130,7 +122,7 @@ robot::Pwm::Pwm(const Pin pwm_pin, int startPwm, const uint16_t frequency_divide
 			pwm.cntr = PWMA_1CNTR;
 			reg = 3;
 			break;
-			
+
 		case Pin::PWM_A2:
 			pwm.cnfg = PWMA_2CNFG;
 			pwm.cs = PWMA_2CS;
@@ -139,7 +131,7 @@ robot::Pwm::Pwm(const Pin pwm_pin, int startPwm, const uint16_t frequency_divide
 			pwm.cntr = PWMA_2CNTR;
 			reg = 4;
 			break;
-			
+
 		case Pin::PWM_B0:
 			pwm.cnfg = PWMB_0CNFG;
 			pwm.cs = PWMB_0CS;
@@ -148,7 +140,7 @@ robot::Pwm::Pwm(const Pin pwm_pin, int startPwm, const uint16_t frequency_divide
 			pwm.cntr = PWMB_0CNTR;
 			reg = 2;
 			break;
-			
+
 		case Pin::PWM_B1:
 			pwm.cnfg = PWMB_1CNFG;
 			pwm.cs = PWMB_1CS;
@@ -157,7 +149,7 @@ robot::Pwm::Pwm(const Pin pwm_pin, int startPwm, const uint16_t frequency_divide
 			pwm.cntr = PWMB_1CNTR;
 			reg = 3;
 			break;
-			
+
 		case Pin::PWM_B2:
 			pwm.cnfg = PWMB_2CNFG;
 			pwm.cs = PWMB_2CS;
@@ -166,7 +158,7 @@ robot::Pwm::Pwm(const Pin pwm_pin, int startPwm, const uint16_t frequency_divide
 			pwm.cntr = PWMB_2CNTR;
 			reg = 4;
 			break;
-		
+
 		case Pin::PWM_C0:
 			pwm.cnfg = PWMC_0CNFG;
 			pwm.cs = PWMC_0CS;
@@ -175,7 +167,7 @@ robot::Pwm::Pwm(const Pin pwm_pin, int startPwm, const uint16_t frequency_divide
 			pwm.cntr = PWMC_0CNTR;
 			reg = 1;
 			break;
-		
+
 		case Pin::PWM_C1:
 			pwm.cnfg = PWMC_1CNFG;
 			pwm.cs = PWMC_1CS;
@@ -184,17 +176,17 @@ robot::Pwm::Pwm(const Pin pwm_pin, int startPwm, const uint16_t frequency_divide
 			pwm.cntr = PWMC_1CNTR;
 			reg = 3;
 			break;
-			
+
 		default:
 			message("incorrect pin to pwm");
 			return;
 	}
-	
+
 	Pwm_Configure(&pwm, Pwm_Invert | Pwm_Mode, Pwm_NotInverted | Pwm_Enabled);
 
     Pwm_ClockSelect(&pwm, Pwm_64x); //64
     Pwm_CounterMaximum(&pwm, frequencyDivider); //12500
-    
+
     if (pwm_pin == Pin::PWM_A0 || pwm_pin == Pin::PWM_A1 || pwm_pin == Pin::PWM_A2) {
 		status = NiFpga_ReadU8(myrio_session, SYSSELECTA, &selectReg);
 		MyRio_ReturnValueIfNotSuccess(status, status,

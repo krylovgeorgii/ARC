@@ -9,9 +9,9 @@
  */
 
 #ifndef _PINS_H_
-#define _PINS_H_ "1.3"
+#define _PINS_H_ "1.4"
 
-#include "config.h"
+#include "type.h"
 
 namespace robot {
 	static constexpr byte P_I_S = 34;

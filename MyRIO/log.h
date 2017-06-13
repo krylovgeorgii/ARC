@@ -19,12 +19,11 @@
  */
 
 #ifndef _LOG_H_
-#define _LOG_H_ "1.3"
+#define _LOG_H_ "1.4"
 
 #include <iostream>
 #include <fstream>
-
-#include "config.h"
+#include "time.h"
 
 namespace robot{
 	struct Log{

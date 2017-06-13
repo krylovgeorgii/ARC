@@ -24,9 +24,8 @@
  */
 
 #ifndef _ROBOT_H_
-#define _ROBOT_H_ "1.6"
+#define _ROBOT_H_ "1.8"
 
-#include <unistd.h>
 #include <sys/types.h>
 #include <pthread.h>
 #include <cmath>
@@ -36,10 +35,7 @@
 #include "AIO.h"
 #include "Encoder.h"
 #include "DIIRQ.h"
-
-#include "config.h"
-
-bool wait(const double waitTime, const bool reactSignal = true);
+#include "pins.h"
 
 namespace robot {
 	NiFpga_Status finish();
@@ -142,7 +138,7 @@ namespace robot {
 		void encRes();
 		float holdTargetAngle(const double target_angle, const double dopPower = 0, const char sign = 0);
 		float holdTargetAngle(const double target_angle, const double P, const double I, const double D,
-				cdouble dopPower = 0, const char sign = 0);
+				const double dopPower = 0, const char sign = 0);
 		float holdTargetLength(const double target_length);
 		float holdTargetLength(const double target_length, const double P, const double I, const double D);
 		void setMinPwmToSpin(const int newPwm);

@@ -17,10 +17,11 @@
  */
 
 #ifndef _TIME_H_
-#define _TIME_H_ "1.2"
+#define _TIME_H_ "1.4"
 
 #include <sys/time.h>
 #include <stdio.h>
+#include <unistd.h>
 
 namespace robot{
 	class Timing{
@@ -48,6 +49,7 @@ namespace robot{
 	extern Timing timing;
 }
 
+bool wait(const double waitTime, const bool reactSignal = true);
 double time(bool update_time = true, timeval *timer = robot::timing.getTimer());
 
 #endif /* _TIME_H_ */

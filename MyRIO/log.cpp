@@ -9,9 +9,9 @@
  */
 
 #ifndef _LOG_CPP_
-#define _LOG_CPP_ "1.3"
+#define _LOG_CPP_ "1.4"
 
-#include "config.h"
+#include "log.h"
 
 namespace robot{
 	Log log;
