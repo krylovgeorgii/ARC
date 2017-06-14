@@ -232,7 +232,7 @@ robot::Pwm::Pwm(const Pin pwm_pin, int startPwm, const uint16_t frequency_divide
     initSucsess = true;
 };
 
-inline void robot::Pwm::pwmWrite(int newPwmValue) {
+ void robot::Pwm::pwmWrite(int newPwmValue) {
 	if (newPwmValue < 0) {
 		newPwmValue = 0;
 	} else if (newPwmValue > frequencyDivider) {
@@ -243,24 +243,24 @@ inline void robot::Pwm::pwmWrite(int newPwmValue) {
 	writeValue = newPwmValue;
 }
 
-inline int robot::Pwm::getPwmWrite() const {
+ int robot::Pwm::getPwmWrite() const {
 	return writeValue;
 }
 
-inline bool robot::Pwm::getInitStatus() const {
+ bool robot::Pwm::getInitStatus() const {
 	return initSucsess;
 }
 
-inline bool robot::Dio::getInitStatus() const {
+ bool robot::Dio::getInitStatus() const {
 	return initSucsess;
 }
 
-inline bool robot::Dio::dioReadRaw() {
+ bool robot::Dio::dioReadRaw() {
 	readValue = Dio_ReadBit(&dio);
 	return readValue;
 }
 
-inline bool robot::Dio::dioRead(const byte num_of_iter) {
+ bool robot::Dio::dioRead(const byte num_of_iter) {
 	signed char numOfHigh = 0;
 
 	for(unsigned int cntr = 0; cntr < num_of_iter; ++cntr) {
@@ -280,16 +280,16 @@ inline bool robot::Dio::dioRead(const byte num_of_iter) {
 	return 0;
 }
 
-inline bool robot::Dio::getDioRead() const {
+ bool robot::Dio::getDioRead() const {
 	return readValue;
 }
 
-inline void robot::Dio::dioWrite(const bool newValue) {
+ void robot::Dio::dioWrite(const bool newValue) {
 	Dio_WriteBit(&dio, newValue);
 	writeValue = newValue;
 }
 
-inline bool robot::Dio::getDioWrite() const {
+ bool robot::Dio::getDioWrite() const {
 	return writeValue;
 }
 
@@ -360,21 +360,21 @@ robot::Dio::Dio(const Pin dio_pin, const bool startValue) {
 	initSucsess = true;
 };
 
-inline void robot::Aio::setMinMaxVal(const double min, const double max) {
+ void robot::Aio::setMinMaxVal(const double min, const double max) {
 	maxVal = max;
 	minVal = min;
 }
 
-inline bool robot::Aio::getInitStatus() const {
+ bool robot::Aio::getInitStatus() const {
 	return initSucsess;
 }
 
-inline double robot::Aio::aioReadRaw() {
+ double robot::Aio::aioReadRaw() {
 	readValue = Aio_Read(&aio);
 	return readValue;
 }
 
-inline double robot::Aio::aioRead(const unsigned int ITER_READ_SEN, const byte NUM_READ_SEN) {
+ double robot::Aio::aioRead(const unsigned int ITER_READ_SEN, const byte NUM_READ_SEN) {
 	if(NUM_READ_SEN == 0) {
 		return 0;
 	}
@@ -408,12 +408,12 @@ inline double robot::Aio::aioRead(const unsigned int ITER_READ_SEN, const byte N
 	return ai_val;
 }
 
-inline double robot::Aio::aioReadNorm(const double max_val, const double min_val,
+ double robot::Aio::aioReadNorm(const double max_val, const double min_val,
 		const unsigned int ITER_READ_SEN, const byte NUM_READ_SEN) {
 	 return  (aioRead(ITER_READ_SEN, NUM_READ_SEN) - min_val) / (max_val - min_val);
 }
 
-inline double robot::Aio::aioReadNorm(const bool useRAW,
+ double robot::Aio::aioReadNorm(const bool useRAW,
 		const unsigned int ITER_READ_SEN, const byte NUM_READ_SEN) {
 	if (useRAW) {
 		return  (aioReadRaw() - minVal) / (maxVal - minVal);
@@ -422,16 +422,16 @@ inline double robot::Aio::aioReadNorm(const bool useRAW,
 	return  (aioRead(ITER_READ_SEN, NUM_READ_SEN) - minVal) / (maxVal - minVal);
 }
 
-inline double robot::Aio::getAioRead() const {
+ double robot::Aio::getAioRead() const {
 	return readValue;
 }
 
-inline void robot::Aio::aioWrite(const double newValue) {
+ void robot::Aio::aioWrite(const double newValue) {
 	Aio_Write(&aio, newValue);
 	writeValue = newValue;
 }
 
-inline double robot::Aio::getAioWrite() const {
+ double robot::Aio::getAioWrite() const {
 	return writeValue;
 }
 
@@ -556,11 +556,11 @@ robot::Aio::Aio(const Pin aio_pin, const double max_val, const double min_val, c
 	initSucsess = true;
 };
 
-inline uint32_t robot::Enc::encRead() {
+ uint32_t robot::Enc::encRead() {
 	return Encoder_Counter(&enc);
 }
 
-inline bool robot::Enc::getInitStatus() const {
+ bool robot::Enc::getInitStatus() const {
 	return initSucsess;
 }
 
@@ -718,11 +718,11 @@ robot::Motor::~Motor() {
 	if (encoder != nullptr) { delete encoder; }
 };
 
-inline bool robot::Motor::isEnc() const {
+ bool robot::Motor::isEnc() const {
 	return isEncoder;
 }
 
-inline uint32_t robot::Motor::getEncRawVal() const {
+ uint32_t robot::Motor::getEncRawVal() const {
 	if (encoder == nullptr) {
 		message("no Enc to read");
 		return 0;
@@ -735,7 +735,7 @@ inline uint32_t robot::Motor::getEncRawVal() const {
 	return encoder->encRead();
 }
 
-inline uint32_t robot::Motor::getEncVal() const {
+ uint32_t robot::Motor::getEncVal() const {
 	if (encoder == nullptr) {
 		message("no Enc to read");
 		return 0;
@@ -745,15 +745,15 @@ inline uint32_t robot::Motor::getEncVal() const {
 	return getEncRawVal() - old_enc;
 }
 
-inline double robot::Motor::getAngleVal() const {
+ double robot::Motor::getAngleVal() const {
 	return enc_degr(getEncVal());
 }
 
-inline double robot::Motor::getLengthVal() const {
+ double robot::Motor::getLengthVal() const {
 	return enc_length(getEncVal());
 }
 
-inline void robot::Motor::setPower(double newPower) const {
+ void robot::Motor::setPower(double newPower) const {
 	bool dioValue = 0;
 
 	if ((newPower < 0 && !pwm_isReversed) || (newPower > 0 && pwm_isReversed)) {
@@ -783,7 +783,7 @@ inline void robot::Motor::setPower(double newPower) const {
 	}
 }
 
-inline void robot::Motor::setRawPower(int newPower) const {
+ void robot::Motor::setRawPower(int newPower) const {
 	bool dioValue = 0;
 
 	if ((newPower < 0 && !pwm_isReversed) || (newPower > 0 && pwm_isReversed)) {
@@ -807,7 +807,7 @@ inline void robot::Motor::setRawPower(int newPower) const {
 	}
 }
 
-inline int robot::Motor::getSetRawPower() const {
+ int robot::Motor::getSetRawPower() const {
 	int power = 0;
 
 	if (pwm_power != nullptr) {
@@ -832,7 +832,7 @@ inline int robot::Motor::getSetRawPower() const {
 	return power;
 }
 
-inline uint32_t robot::Motor::degr_enc(const double degr) const {
+ uint32_t robot::Motor::degr_enc(const double degr) const {
 	if (encoder == nullptr) {
 		message("no encoder on this motor! degr_edc(" << degr << ")");
 	}
@@ -840,44 +840,44 @@ inline uint32_t robot::Motor::degr_enc(const double degr) const {
 	return degr * encInDegr + 0.5;
 }
 
-inline double robot::Motor::enc_degr(const uint32_t enc_val) const {
+ double robot::Motor::enc_degr(const uint32_t enc_val) const {
 	return static_cast<int>(enc_val / encInDegr);
 }
 
-inline uint32_t robot::Motor::length_enc(const double length, const double whl_diam) const {
+ uint32_t robot::Motor::length_enc(const double length, const double whl_diam) const {
 	return degr_enc(360 * length / (whl_diam * PI));
 }
 
-inline double robot::Motor::enc_length(const uint32_t enc_val) const {
+ double robot::Motor::enc_length(const uint32_t enc_val) const {
 	return enc_degr(enc_val) * wheelDiam * PI / 360;
 }
 
-inline uint32_t robot::Motor::length_enc(const double length) const {
+ uint32_t robot::Motor::length_enc(const double length) const {
 	return length_enc (length, wheelDiam);
 }
 
-inline void robot::Motor::reverseMotorPower() {
+ void robot::Motor::reverseMotorPower() {
 	int power = getSetRawPower();
 	pwm_isReversed = !pwm_isReversed;
 	setRawPower(power);
 }
 
-inline void robot::Motor::reverseEncoder() {
+ void robot::Motor::reverseEncoder() {
 	enc_isReversed = !enc_isReversed;
 }
 
-inline void robot::Motor::reverseMotor() {
+ void robot::Motor::reverseMotor() {
 	reverseMotorPower();
 	reverseEncoder();
 }
 
-inline void robot::Motor::setPID_angle(const double P, const double I, const double D) {
+ void robot::Motor::setPID_angle(const double P, const double I, const double D) {
 	P_angle = P;
 	I_angle = I;
 	D_angle = D;
 }
 
-inline void robot::Motor::setPID_length(const double P, const double I, const double D) {
+ void robot::Motor::setPID_length(const double P, const double I, const double D) {
 	P_length = P;
 	I_length = I;
 	D_length = D;
@@ -906,7 +906,7 @@ robot::WheelBaze::~WheelBaze() {
 	if (R_mtr != nullptr) { delete R_mtr; }
 };
 
-inline double robot::WheelBaze::enc_length(const uint32_t enc_value) const {
+ double robot::WheelBaze::enc_length(const uint32_t enc_value) const {
 	if (L_mtr != nullptr) {
 		return L_mtr->enc_length(enc_value);
 	}
@@ -919,7 +919,7 @@ inline double robot::WheelBaze::enc_length(const uint32_t enc_value) const {
 	return 0;
 }
 
-inline uint32_t robot::WheelBaze::length_enc(const double length) const {
+ uint32_t robot::WheelBaze::length_enc(const double length) const {
 	if (L_mtr != nullptr) {
 		return L_mtr->length_enc(length);
 	}
@@ -932,19 +932,19 @@ inline uint32_t robot::WheelBaze::length_enc(const double length) const {
 	return 0;
 }
 
-inline double robot::WheelBaze::enc_robotDegr(const uint32_t enc_value) const {
+ double robot::WheelBaze::enc_robotDegr(const uint32_t enc_value) const {
 	return enc_length(enc_value) * 360 / (robotDiam * PI);
 }
 
-inline uint32_t robot::WheelBaze::robotDegr_enc(const double rbt_degr, const double rbt_diam) const {
+ uint32_t robot::WheelBaze::robotDegr_enc(const double rbt_degr, const double rbt_diam) const {
 	return length_enc(rbt_degr * rbt_diam * PI / 360);
 }
 
-inline uint32_t robot::WheelBaze::robotDegr_enc(const double rbt_degr) const {
+ uint32_t robot::WheelBaze::robotDegr_enc(const double rbt_degr) const {
 	return robotDegr_enc(rbt_degr, robotDiam);
 }
 
-inline void robot::WheelBaze::ride(const double L_power, const double R_power) const {
+ void robot::WheelBaze::ride(const double L_power, const double R_power) const {
 	if (L_mtr != nullptr) {
 		L_mtr->setPower(L_power);
 	} else {
@@ -958,32 +958,32 @@ inline void robot::WheelBaze::ride(const double L_power, const double R_power) c
 	}
 }
 
-inline void robot::WheelBaze::ride(const double power) const {
+ void robot::WheelBaze::ride(const double power) const {
 	ride(power, power);
 }
 
-inline void robot::WheelBaze::stop(const double waitTime) const {
+ void robot::WheelBaze::stop(const double waitTime) const {
 	ride(0);
 	wait(waitTime, false);
 }
 
-inline void robot::WheelBaze::rideStr(uint32_t L_enc, uint32_t R_enc, const double power, const double P) const {
+ void robot::WheelBaze::rideStr(uint32_t L_enc, uint32_t R_enc, const double power, const double P) const {
 	ride(power + (R_enc - L_enc) * P, power + (L_enc - R_enc) * P);
 }
 
-inline void robot::WheelBaze::rideStr(const double power, const double P) const {
+ void robot::WheelBaze::rideStr(const double power, const double P) const {
 	rideStr(L_enc(), R_enc(), power, P);
 }
 
-inline void robot::WheelBaze::rideStr(const double power) const {
+ void robot::WheelBaze::rideStr(const double power) const {
 	rideStr(L_enc(), R_enc(), power, P_rideStr);
 }
 
-inline void robot::WheelBaze::setP_rideStr(const double P) {
+ void robot::WheelBaze::setP_rideStr(const double P) {
 	P_rideStr = P;
 }
 
-inline uint32_t robot::WheelBaze::encRaw(Motor *mtr) const {
+ uint32_t robot::WheelBaze::encRaw(Motor *mtr) const {
 	if (mtr == nullptr) {
 		message("no Motor to encRaw(mtr)");
 		return 0;
@@ -995,7 +995,7 @@ inline uint32_t robot::WheelBaze::encRaw(Motor *mtr) const {
 	return mtr->getEncRawVal();
 }
 
-inline int robot::WheelBaze::enc(Motor *mtr) const {
+ int robot::WheelBaze::enc(Motor *mtr) const {
 	if (mtr == nullptr) {
 		message("no Motor to encRaw(mtr)");
 		return 0;
@@ -1007,31 +1007,31 @@ inline int robot::WheelBaze::enc(Motor *mtr) const {
 	return mtr->getEncVal();
 }
 
-inline uint32_t robot::WheelBaze::L_encRaw() const {
+ uint32_t robot::WheelBaze::L_encRaw() const {
 	return encRaw(L_mtr);
 }
 
-inline uint32_t robot::WheelBaze::R_encRaw() const {
+ uint32_t robot::WheelBaze::R_encRaw() const {
 	return encRaw(R_mtr);
 }
 
-inline uint32_t robot::WheelBaze::L_enc() const {
+ uint32_t robot::WheelBaze::L_enc() const {
 	return enc(L_mtr);
 }
 
-inline uint32_t robot::WheelBaze::R_enc() const {
+ uint32_t robot::WheelBaze::R_enc() const {
 	return enc(R_mtr);
 }
 
-inline void robot::WheelBaze::L_encRes() const {
+ void robot::WheelBaze::L_encRes() const {
 	encRes(L_mtr);
 }
 
-inline void robot::WheelBaze::R_encRes() const {
+ void robot::WheelBaze::R_encRes() const {
 	encRes(R_mtr);
 }
 
-inline void robot::WheelBaze::encRes(Motor *mtr) const {
+ void robot::WheelBaze::encRes(Motor *mtr) const {
 	if (mtr == nullptr) {
 		message("no Motor to encRes(mtr)");
 	} else {
@@ -1041,12 +1041,12 @@ inline void robot::WheelBaze::encRes(Motor *mtr) const {
 	wait(0.01);
 }
 
-inline void robot::Motor::encRes() {
+ void robot::Motor::encRes() {
 	old_enc = getEncRawVal();
 	wait(0.01);
 }
 
-inline float robot::Motor::holdTargetAngle(const double target_angle,
+ float robot::Motor::holdTargetAngle(const double target_angle,
 		const double P, const double I, const double D, const double dopPower, const char sign) {
 	double err = target_angle - enc_degr(getEncVal());
 	double d_comp = 0;
@@ -1091,23 +1091,23 @@ inline float robot::Motor::holdTargetAngle(const double target_angle,
 	return err;
 }
 
-inline float robot::Motor::holdTargetAngle(const double  target_angle, const double dopPower, const char sign) {
+ float robot::Motor::holdTargetAngle(const double  target_angle, const double dopPower, const char sign) {
 	return holdTargetAngle(target_angle, P_angle, I_angle, D_angle, dopPower, sign);
 }
 
-inline void robot::Motor::setTimeout_PID(const double timeout) {
+ void robot::Motor::setTimeout_PID(const double timeout) {
 	Timeout_PID = timeout;
 }
 
-inline void robot::Motor::setMinTime_D(const double minTime) {
+ void robot::Motor::setMinTime_D(const double minTime) {
 	MinTime_D = minTime;
 }
 
-inline void robot::Motor::setMinPwmToSpin(const int newPwm) {
+ void robot::Motor::setMinPwmToSpin(const int newPwm) {
 	minPwmToSpin = newPwm;
 }
 
-inline float robot::Motor::holdTargetLength(const double target_length,
+ float robot::Motor::holdTargetLength(const double target_length,
 		const double P, const double I, const double D) {
 	double err = target_length - enc_length(getEncVal());
 	double newTime = time();
@@ -1137,17 +1137,17 @@ inline float robot::Motor::holdTargetLength(const double target_length,
 	return err;
 }
 
-inline float robot::Motor::holdTargetLength(const double target_length) {
+ float robot::Motor::holdTargetLength(const double target_length) {
 	return  holdTargetLength(target_length, P_length, I_length, D_length);
 }
 
-inline void robot::WheelBaze::encRes() const {
+ void robot::WheelBaze::encRes() const {
 	L_encRes();
 	R_encRes();
 	wait(0.1);
 }
 
-inline int robot::WheelBaze::enc(const bool L_enc_inv, const bool R_enc_inv) const {
+ int robot::WheelBaze::enc(const bool L_enc_inv, const bool R_enc_inv) const {
 	bool L_isEnc = false;
 	bool R_isEnc = false;
 
@@ -1180,23 +1180,23 @@ inline int robot::WheelBaze::enc(const bool L_enc_inv, const bool R_enc_inv) con
 	return 0;
 }
 
-inline robot::Motor* robot::WheelBaze::L() {
+ robot::Motor* robot::WheelBaze::L() {
 	return L_mtr;
 }
 
-inline robot::Motor* robot::WheelBaze::R() {
+ robot::Motor* robot::WheelBaze::R() {
 	return R_mtr;
 }
 
-inline void robot::WheelBaze::turn(const double L_power, const double R_power) const {
+ void robot::WheelBaze::turn(const double L_power, const double R_power) const {
 	ride(L_power, R_power);
 }
 
-inline void robot::WheelBaze::turn(const double power) const {
+ void robot::WheelBaze::turn(const double power) const {
 	turn(power, -power);
 }
 
-inline void robot::Servo::setRawPwm(const int pwm_value) const {
+ void robot::Servo::setRawPwm(const int pwm_value) const {
 	if (pwm == nullptr) {
 		message("no Pwm pwm to setRawPwm(" << pwm_value << ")");
 		return;
@@ -1205,7 +1205,7 @@ inline void robot::Servo::setRawPwm(const int pwm_value) const {
 	pwm->pwmWrite(pwm_value);
 }
 
-inline int robot::Servo::getSetRawPwm() const {
+ int robot::Servo::getSetRawPwm() const {
 	if (pwm == nullptr) {
 		message("no Pwm pwm to getSetRawPwm()");
 		return 0;
@@ -1214,11 +1214,11 @@ inline int robot::Servo::getSetRawPwm() const {
 	return pwm->getPwmWrite();
 }
 
-inline void robot::Servo::relax() const {
+ void robot::Servo::relax() const {
 	setRawPwm(0);
 }
 
-inline void robot::Servo::setAngle(const double angle) const {
+ void robot::Servo::setAngle(const double angle) const {
 	if (angle < 0) {
 		message("angle " << angle << " can't be less than zero. Pwm set to minPwm");
 		setRawPwm(minPwm);
