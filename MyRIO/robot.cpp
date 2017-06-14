@@ -841,7 +841,7 @@ robot::Motor::~Motor() {
 }
 
  double robot::Motor::enc_degr(const uint32_t enc_val) const {
-	return static_cast<int>(enc_val / encInDegr);
+	return static_cast<int>(enc_val) / encInDegr;
 }
 
  uint32_t robot::Motor::length_enc(const double length, const double whl_diam) const {
