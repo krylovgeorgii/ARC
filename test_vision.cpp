@@ -1,15 +1,15 @@
 #include "MyRIO/vision.h"
 
-//#define DISPLAY 1
+#define DISPLAY
 
 #ifdef DISPLAY
   #include "MyRIO/display.h"
 #endif /* DISPLAY */
 
 
-bool DRAW = 0;
+bool DRAW = 1;
 
-robot::vision::CV_UV cam1(640, 420, "/dev/video1", DRAW);  //(1920, 1080); //1280, 720
+robot::vision::CV_UV cam1(640, 420, "/dev/video0", DRAW);  //(1920, 1080); //1280, 720 (640, 420)
 
 #ifdef DISPLAY
   robot::vision::Display window1(cam1.getW(), cam1.getH());
@@ -26,6 +26,7 @@ void vision() {
 
   while (!quit) {
     double startOneFTIme = time();
+
     cam1.handle_frame();
 
     #ifdef DISPLAY

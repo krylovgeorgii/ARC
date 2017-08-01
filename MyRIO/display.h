@@ -5,17 +5,16 @@
  * Contacts:
  * 			krylov.georgii@gmail.com
  * 			https://vk.com/krylov.georgii
+ *      https://www.facebook.com/krylov.georgii
  *
  */
 
 #ifndef _DISPLAY_H_
-#define _DISPLAY_H_ "1.0"
+#define _DISPLAY_H_ "1.1"
 
 #include <SDL2/SDL.h>
-#include <jpeglib.h>
 
 #include "log.h"
-
 
 namespace robot {
     namespace vision {
@@ -38,7 +37,7 @@ namespace robot {
 
           if (window == nullptr) {
             message("Failed to create window : " << SDL_GetError());
-            return ;
+            return;
           }
 
           renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
@@ -51,6 +50,10 @@ namespace robot {
           SDL_RenderSetLogicalSize(renderer, W, H);
         }
 
+        ~Display() {
+          SDL_DestroyWindow(window);
+        }
+
         void displayWindow(uint8_t * rgb);
 
       private:
@@ -60,8 +63,6 @@ namespace robot {
             SDL_RenderDrawPoint(renderer, x, y);
         }
       };
-
-      void jpeg(FILE * dest, uint8_t * rgb, uint32_t width, uint32_t height, int quality);
   } /* END namespace vision */
 } /* END namespace robot */
 

@@ -5,11 +5,12 @@
  * Contacts:
  * 			krylov.georgii@gmail.com
  * 			https://vk.com/krylov.georgii
+ *      https://www.facebook.com/krylov.georgii
  *
  */
 
 #ifndef _VISION_H_
-#define _VISION_H_ "1.1"
+#define _VISION_H_ "1.2"
 
 #include "log.h"
 
@@ -127,10 +128,33 @@ namespace robot {
 
         class CV_UV : public Camera {
         private:
-          static const uint8_t NUM_KIND_TARGETS = 2;
-          CvPoint<int8_t> targetUV[NUM_KIND_TARGETS + 1] { CvPoint<int8_t> { -38, 2 }, CvPoint<int8_t> { 51, -69 } }; // CvPoint<int8_t> { -60, 11 }, //,  CvPoint<int8_t> { 65, -50 } };
-          int Y_MAX_DIFF = 30;
-          const double ANGL = 0.98;
+          uint8_t blueAngle_N = 0;
+          uint8_t orangeAngle_N = 1;
+          uint8_t greenS_N = 2;
+          uint8_t redS_N = 3;
+          uint8_t yellowSquare_N = 4;
+          uint8_t blueBeam_N = 5;
+
+          CvPoint<int8_t> blueAngle { 60, -40 };
+          CvPoint<int8_t> orangeAngle { -40, 70 };
+          CvPoint<int8_t> greenS { -11, -12 };
+          CvPoint<int8_t> redS { -20, 53 };
+          CvPoint<int8_t> yellowSquare { -83, 15 };
+          CvPoint<int8_t> blueBeam { 55, -47 };
+
+          int blueAngle_Y = 32;
+          int blueBeam_Y = 0;
+
+          int orangeAngle_Y = 0;
+          int redS_Y = 0;
+
+          static const uint8_t NUM_KIND_TARGETS = 6;
+
+          CvPoint<int8_t> targetUV[6]  { blueAngle, orangeAngle, greenS, redS, yellowSquare, blueBeam };
+          int Y_MAX_DIFF = 200;
+          const double ANGL = 0.94;
+          const int Y_MAX = 500;//80;
+          const int Y_MIN = 0;
 
           bool DRAW;
           int8_t * uv = nullptr;
@@ -157,6 +181,15 @@ namespace robot {
             CV_UV(const int w, const int h,
                     std::string device = "/dev/video1", bool draw = true, settings_t newSettings = settings_t(), timeval t = timeval { 1, 0 })
                     : Camera(w, h, device, newSettings, t), DRAW(draw) {
+
+                  Y_BEGIN = 0;
+                  Y_END = H;
+                  X_BEGIN = 0;
+                  X_END = W / 2;
+
+                  X_CLB_CLR = X_BEGIN + (X_END - X_BEGIN) / 2;
+                  Y_CLB_CLR = Y_BEGIN + (Y_END - Y_BEGIN) / 2;
+                  NUM_PIX = (X_END - X_BEGIN) * (Y_END - Y_BEGIN);
 
                   color = new uint8_t * [X_END - X_BEGIN];
                   if (color == nullptr) {
@@ -215,11 +248,11 @@ namespace robot {
               return rgb;
             }
 
-            int handle_frame();
+            CvPoint<int> handle_frame();
             void yuyv2uv();
-            void calibUV(const int RAD_CLB_CLR = 10);
+            void calibUV( const bool onlyCalibOrOnlyDisplay, const int RAD_CLB_CLR = 10);
             void find_color();
-            void find_components();
+            CvPoint<int> find_components();
             void uv2yuyv();
             uint8_t * yuyv2rgb();
             int minmax(int min, int v, int max);

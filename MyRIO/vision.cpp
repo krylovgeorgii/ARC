@@ -5,11 +5,12 @@
  * Contacts:
  * 			krylov.georgii@gmail.com
  * 			https://vk.com/krylov.georgii
+ *      https://www.facebook.com/krylov.georgii
  *
  */
 
 #ifndef _VISION_CPP_
-#define _VISION_CPP_ "1.1"
+#define _VISION_CPP_ "1.2"
 
 #include "vision.h"
 
@@ -40,7 +41,7 @@ namespace robot {
             return true;
         }
 
-        inline int Camera::xioctl(const int fd, const int request, const void * arg) const {
+         int Camera::xioctl(const int fd, const int request, const void * arg) const {
             for (int i = 0; i < 100; ++i) {
                 int r = ioctl(fd, request, arg);
 
@@ -85,11 +86,11 @@ namespace robot {
 
             v4l2_control ctrl;
 
-            ctrl.id = V4L2_CID_FOCUS_AUTO;
+            /*ctrl.id = V4L2_CID_FOCUS_AUTO;
             ctrl.value = 0;
             if (-1 == xioctl(camera->fd, VIDIOC_S_CTRL, &ctrl)) {
                 message("can't set focus");
-            }
+            }*/
 
             ctrl.id = V4L2_CID_FOCUS_ABSOLUTE;
             ctrl.value = 5;
@@ -97,11 +98,11 @@ namespace robot {
                 message("can't set focus");
             }
 
-            ctrl.id = V4L2_CID_EXPOSURE_AUTO;
+            /*ctrl.id = V4L2_CID_EXPOSURE_AUTO;
             ctrl.value = settings.EXPOSURE_TYPE;
             if (-1 == ioctl(camera->fd, VIDIOC_S_CTRL, &ctrl)) {
                 message("can't set cam settings");
-            }
+            }*/
 
             if (settings.EXPOSURE_TYPE == V4L2_EXPOSURE_MANUAL) {
                 ctrl.id = V4L2_CID_EXPOSURE_ABSOLUTE;
@@ -231,7 +232,7 @@ namespace robot {
             camera_close();
        }
 
-       inline int Camera::camera_capture() {
+        int Camera::camera_capture() {
          v4l2_buffer buf;
          memset(&buf, 0, sizeof buf);
          buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
@@ -251,7 +252,7 @@ namespace robot {
          return true;
        }
 
-       inline int Camera::camera_frame() {
+        int Camera::camera_frame() {
          fd_set fds;
          FD_ZERO(&fds);
          FD_SET(camera->fd, &fds);
@@ -285,45 +286,62 @@ namespace robot {
          }
        }
 
-       inline void CV_UV::calibUV(const int RAD_CLB_CLR) {
-           int u = 0, v = 0;
+       void CV_UV::calibUV(const bool onlyCalibOrOnlyDisplay, const int RAD_CLB_CLR) {
+          if (onlyCalibOrOnlyDisplay == 1) {
+            for(int x = -RAD_CLB_CLR; x < RAD_CLB_CLR; ++x) {
+              for(int y = -RAD_CLB_CLR; y < RAD_CLB_CLR; ++y) {
+                if (DRAW) {
+                  setColorUV(uv, x + X_CLB_CLR, y + Y_CLB_CLR, 0, 128);
+                  setColorUV(uv, x + X_CLB_CLR, y + Y_CLB_CLR, 1, 128);
+                }
+              }
+            }
+
+            return;
+          }
+
+           double u = 0, v = 0, Y = 0;
            int numColors = 0;
 
+
+
            for(int x = -RAD_CLB_CLR; x < RAD_CLB_CLR; ++x) {
-               for(int y = -RAD_CLB_CLR; y < RAD_CLB_CLR; ++y) {
-                   if (getColorY(x + X_CLB_CLR, y + Y_CLB_CLR) < 40 || getColorY(x + X_CLB_CLR, y + Y_CLB_CLR) > 280) {
-                      continue;
-                   }
+              for(int y = -RAD_CLB_CLR; y < RAD_CLB_CLR; ++y) {
 
-                   int8_t u_t = getColorUV(uv, x + X_CLB_CLR, y + Y_CLB_CLR, 0);
-                   int8_t v_t = getColorUV(uv, x + X_CLB_CLR, y + Y_CLB_CLR, 1);
+                int y_t = getColorY(x + X_CLB_CLR, y + Y_CLB_CLR);
 
-                   /*if (abs(u_t) < 3 && abs(v_t) < 3) {
-                       continue;
-                   }*/
+                /*if (y_t < Y_MIN || y_t > Y_MAX) {
+                  continue;
+                }*/
 
-                   u += u_t;
-                   v += v_t;
-                   ++numColors;
+                int u_t = getColorUV(uv, x + X_CLB_CLR, y + Y_CLB_CLR, 0);
+                int v_t = getColorUV(uv, x + X_CLB_CLR, y + Y_CLB_CLR, 1);
 
-                   if (DRAW) {
-                     setColorUV(uv, x + X_CLB_CLR, y + Y_CLB_CLR, 0, 128);
-                     setColorUV(uv, x + X_CLB_CLR, y + Y_CLB_CLR, 1, 128);
-                   }
-               }
+
+                u += u_t;
+                v += v_t;
+                Y += y_t;
+
+                ++numColors;
+              }
            }
 
-           /*message("\nu = " << getColorUV(uv, X_CLB_CLR, Y_CLB_CLR, 0)
-                << "\nv = " << getColorUV(uv, X_CLB_CLR, Y_CLB_CLR, 1));*/
-           //message("numColors = " << numColors);
+           if (numColors < RAD_CLB_CLR * 2) {
+             message("numColors less than half: " << numColors << " in " << RAD_CLB_CLR * 4);
+           }
 
-           u = static_cast<double>(u) / numColors + 0.5;
-           v = static_cast<double>(v) / numColors + 0.5;
+           if (numColors == 0) {
+             return;
+           }
 
-           //message("\nU = " << u << "\nV = " << v);
+           u /= numColors;
+           v /= numColors;
+           Y /= numColors;
+
+           message("\nU = " << u << "\nV = " << v << "\ny = " << Y);
        }
 
-       inline void CV_UV::uv2yuyv() {
+        void CV_UV::uv2yuyv() {
          for (size_t i = 0; i < H; ++i) {
            for (size_t j = 0; j < W; j += 2) {
              size_t index = i * W + j;
@@ -333,49 +351,82 @@ namespace robot {
          }
        }
 
-       inline void CV_UV::find_color() {
-         double t_val[NUM_KIND_TARGETS];
+      void CV_UV::find_color() {
+        double cosVal[NUM_KIND_TARGETS];
+        double t_val[NUM_KIND_TARGETS];
 
-         for(int i = 0; i < NUM_KIND_TARGETS; ++i) {
-             t_val[i] = sqrt(targetUV[i].y * targetUV[i].y + targetUV[i].x * targetUV[i].x);
-         }
+        for (int i = 0; i < NUM_KIND_TARGETS; ++i) {
+           t_val[i] = sqrt(targetUV[i].y * targetUV[i].y + targetUV[i].x * targetUV[i].x);
+        }
 
-         for(int y = Y_BEGIN; y < Y_END; ++y) {
-             for(int x = X_BEGIN; x < X_END; ++x) {
-                 int8_t t_u = getColorUV(uv, x, y, 0);
-                 int8_t t_v = getColorUV(uv, x, y, 1);
+        for (int y = Y_BEGIN; y < Y_END; ++y) {
+          for (int x = X_BEGIN; x < X_END; ++x) {
+            int8_t t_u = getColorUV(uv, x, y, 0);
+            int8_t t_v = getColorUV(uv, x, y, 1);
 
-                 color[x - X_BEGIN][y - Y_BEGIN] = 0;
+            color[x - X_BEGIN][y - Y_BEGIN] = 0;
 
-                 for(int i = 0; i < NUM_KIND_TARGETS; ++i) {
-                    //message("Y = " << (int)getColorY(x, y));
-                    if (getColorY(x, y) < 20 || getColorY(x, y) > 280 || (abs(getColorUV(uv, x, y, 0)) < 5 && abs(getColorUV(uv, x, y, 1)) < 5)) {
-                      if (DRAW) {
-                        setColorUV(uv, x, y, 0, -100);
-                        setColorUV(uv, x, y, 1, 128);
-                        setColorY(x, y, 255);
-                      }
-                      continue;
-                    }
+            if (getColorY(x, y) < Y_MIN || getColorY(x, y) > Y_MAX || (abs(getColorUV(uv, x, y, 0)) < 5 && abs(getColorUV(uv, x, y, 1)) < 5)) {
+              if (DRAW) {
+                setColorUV(uv, x, y, 0, -100);
+                setColorUV(uv, x, y, 1, 128);
+                setColorY(x, y, 255);
+              }
 
-                    double cosB = (t_u * targetUV[i].x + t_v * targetUV[i].y) / (t_val[i] * sqrt(t_u * t_u + t_v * t_v));
+              continue;
+            }
 
-                    if (cosB <= ANGL) {
-                      continue;
-                    }
+            for (uint8_t i = 0; i < NUM_KIND_TARGETS; ++i) {
+              cosVal[i] = (t_u * targetUV[i].x + t_v * targetUV[i].y) / (t_val[i] * sqrt(t_u * t_u + t_v * t_v));
+            }
 
-                    color[x - X_BEGIN][y - Y_BEGIN] = i + 1;
+            double maxCosVal = cosVal[0];
+            uint8_t numMaxCos = 0;
 
-                    if (DRAW) {
-                        setColorUV(uv, x, y, 0, -120);
-                        setColorUV(uv, x, y, 1, 120);
-                    }
-                 }
-             }
+            for (uint8_t i = 1; i < NUM_KIND_TARGETS; ++i) {
+              if (cosVal[i] > maxCosVal) {
+                maxCosVal = cosVal[i];
+                numMaxCos = i;
+              }
+            }
+
+            if (maxCosVal <= ANGL) {
+              continue;
+            }
+
+            if (numMaxCos == blueAngle_N || numMaxCos == blueBeam_N) {
+              if ((static_cast<int>(blueAngle.x) - t_u) * (static_cast<int>(blueAngle.x) - t_u) +
+                  (static_cast<int>(blueAngle.y) - t_v) * (static_cast<int>(blueAngle.y) - t_v) >
+                      (static_cast<int>(blueBeam.x) - t_u) * (static_cast<int>(blueBeam.x) - t_u) +
+                      (static_cast<int>(blueBeam.y) - t_v) * (static_cast<int>(blueBeam.y) - t_v)) {
+                numMaxCos = blueAngle_N;
+              } else {
+                numMaxCos = blueBeam_N;
+              }
+            }
+
+            if (numMaxCos == orangeAngle_N || numMaxCos == redS_N) {
+              if ((static_cast<int>(orangeAngle.x) - t_u) * (static_cast<int>(orangeAngle.x) - t_u) +
+                  (static_cast<int>(orangeAngle.y) - t_v) * (static_cast<int>(orangeAngle.y) - t_v) >
+                      (static_cast<int>(redS.x) - t_u) * (static_cast<int>(redS.x) - t_u) +
+                      (static_cast<int>(redS.y) - t_v) * (static_cast<int>(redS.y) - t_v)) {
+                numMaxCos = orangeAngle_N;
+              } else {
+                numMaxCos = redS_N;
+              }
+            }
+
+            color[x - X_BEGIN][y - Y_BEGIN] = numMaxCos + 1;
+
+            if (DRAW) {
+              setColorUV(uv, x, y, 0, -targetUV[numMaxCos].x);
+              setColorUV(uv, x, y, 1, targetUV[numMaxCos].y);
+            }
           }
-       }
+        }
+      }
 
-       inline void CV_UV::find_components() {
+        CvPoint<int> CV_UV::find_components() {
            for (int i = 0; i < NUM_PIX; ++i) {
               numINComp[i] = 0;
               colorOfComp[i] = 0;
@@ -475,8 +526,8 @@ namespace robot {
                    for (int i = 0; i < NUM_KIND_TARGETS; ++i) {
                        if (comp[x - X_BEGIN][y - Y_BEGIN] == maxComp[i]) {
                             if (DRAW) {
-                              setColorUV(uv, x, y, 0, targetUV[(i + 1) % NUM_KIND_TARGETS].x);
-                              setColorUV(uv, x, y, 1, targetUV[(i + 1) % NUM_KIND_TARGETS].y);
+                              setColorUV(uv, x, y, 0, -targetUV[i].x);
+                              setColorUV(uv, x, y, 1, -targetUV[i].y);
                             }
 
                             c_mass[i].x += x;
@@ -513,31 +564,31 @@ namespace robot {
                    }
                 }
             }
+
+            return c_mass[0];
         }
 
 
-      int CV_UV::handle_frame() {
+      CvPoint<int> CV_UV::handle_frame() {
             if (!camera_frame()) {
                 message("error camera_frame");
-                return 1;
+                return CvPoint<int> { 0, 0 };
             }
 
-            //yuyv2uv();
-            calibUV();
+            calibUV(0);
             find_color();
-            find_components();
-            //uv2yuyv();
+            CvPoint<int> value = find_components();
 
             if (DRAW) {
+              calibUV(1);
               yuyv2rgb();
-              //displayWindow(rgb);
             }
 
-            return 0;
+            return value;
       }
 
        int CV_UV::minmax(int min, int v, int max) {
-            return (v < min) ? min : (max < v) ? max : v;
+          return (v < min) ? min : (max < v) ? max : v;
        }
 
        uint8_t * CV_UV::yuyv2rgb() {

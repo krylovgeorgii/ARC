@@ -1,0 +1,2 @@
+g++ -std=c++11 -O3 test_vision.cpp MyRIO/vision.cpp MyRIO/log.cpp MyRIO/time.cpp MyRIO/display.cpp  -o test  -lSDL2
+
