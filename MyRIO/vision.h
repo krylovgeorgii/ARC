@@ -10,7 +10,7 @@
  */
 
 #ifndef _VISION_H_
-#define _VISION_H_ "1.2"
+#define _VISION_H_ "1.3"
 
 #include "log.h"
 
@@ -177,6 +177,8 @@ namespace robot {
           int * colorOfComp = nullptr;
           uint8_t * rgb = nullptr;
 
+          uint8_t numBiggestColor;
+
         public:
             CV_UV(const int w, const int h,
                     std::string device = "/dev/video1", bool draw = true, settings_t newSettings = settings_t(), timeval t = timeval { 1, 0 })
@@ -246,6 +248,10 @@ namespace robot {
 
             uint8_t * getRGB () {
               return rgb;
+            }
+
+            uint8_t getNumBiggestColor() {
+              return numBiggestColor;
             }
 
             CvPoint<int> handle_frame();

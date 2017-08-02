@@ -10,7 +10,7 @@
  */
 
 #ifndef _VISION_CPP_
-#define _VISION_CPP_ "1.2"
+#define _VISION_CPP_ "1.3"
 
 #include "vision.h"
 
@@ -396,7 +396,7 @@ namespace robot {
 
             if (numMaxCos == blueAngle_N || numMaxCos == blueBeam_N) {
               if ((static_cast<int>(blueAngle.x) - t_u) * (static_cast<int>(blueAngle.x) - t_u) +
-                  (static_cast<int>(blueAngle.y) - t_v) * (static_cast<int>(blueAngle.y) - t_v) >
+                  (static_cast<int>(blueAngle.y) - t_v) * (static_cast<int>(blueAngle.y) - t_v) <
                       (static_cast<int>(blueBeam.x) - t_u) * (static_cast<int>(blueBeam.x) - t_u) +
                       (static_cast<int>(blueBeam.y) - t_v) * (static_cast<int>(blueBeam.y) - t_v)) {
                 numMaxCos = blueAngle_N;
@@ -407,7 +407,7 @@ namespace robot {
 
             if (numMaxCos == orangeAngle_N || numMaxCos == redS_N) {
               if ((static_cast<int>(orangeAngle.x) - t_u) * (static_cast<int>(orangeAngle.x) - t_u) +
-                  (static_cast<int>(orangeAngle.y) - t_v) * (static_cast<int>(orangeAngle.y) - t_v) >
+                  (static_cast<int>(orangeAngle.y) - t_v) * (static_cast<int>(orangeAngle.y) - t_v) <
                       (static_cast<int>(redS.x) - t_u) * (static_cast<int>(redS.x) - t_u) +
                       (static_cast<int>(redS.y) - t_v) * (static_cast<int>(redS.y) - t_v)) {
                 numMaxCos = orangeAngle_N;
@@ -498,16 +498,17 @@ namespace robot {
            int maxValue[NUM_KIND_TARGETS];
            CvPoint<int> c_mass[NUM_KIND_TARGETS];
 
-           for (int i = 0; i < NUM_KIND_TARGETS; ++i) {
+           for (uint8_t i = 0; i < NUM_KIND_TARGETS; ++i) {
               maxComp[i] = -1;
               maxValue[i] = 1;
               c_mass[i] = CvPoint<int> { 0, 0 };
+
            }
 
            //std::unique_ptr<CvPoint<int>> c_mass(new CvPoint<int>[targetUV.size()](CvPoint<int> { 0, 0 }));
-          for (int j = 0; j < NUM_KIND_TARGETS; ++j) {
+          for (uint8_t j = 0; j < NUM_KIND_TARGETS; ++j) {
               for (int i = 0; i < n; ++i) {
-                  if(colorOfComp[i] != j + 1) {
+                  if (colorOfComp[i] != j + 1) {
                     continue;
                   }
 
@@ -518,12 +519,9 @@ namespace robot {
               }
             }
 
-            //message("maxComp = " << maxComp[0]);
-            //message("maxValue = " << maxValue[0]);
-
             for (int y = Y_BEGIN; y < Y_END; ++y) {
                 for (int x = X_BEGIN; x < X_END; ++x) {
-                   for (int i = 0; i < NUM_KIND_TARGETS; ++i) {
+                   for (uint8_t i = 0; i < NUM_KIND_TARGETS; ++i) {
                        if (comp[x - X_BEGIN][y - Y_BEGIN] == maxComp[i]) {
                             if (DRAW) {
                               setColorUV(uv, x, y, 0, -targetUV[i].x);
@@ -537,7 +535,7 @@ namespace robot {
                 }
             }
 
-            for (int i = 0; i < NUM_KIND_TARGETS; ++i) {
+            for (uint8_t i = 0; i < NUM_KIND_TARGETS; ++i) {
                 if (maxValue[i] != 0) {
                   c_mass[i].x /=  maxValue[i];
                   c_mass[i].y /=  maxValue[i];
@@ -565,7 +563,39 @@ namespace robot {
                 }
             }
 
-            return c_mass[0];
+            int maxCompOfAll = 0;
+            int maxValueOfAllComp = maxValue[0];
+
+            for (uint8_t i = 1; i < NUM_KIND_TARGETS; ++i) {
+              if (maxValue[i] > maxValueOfAllComp) {
+                maxValueOfAllComp = maxValue[i];
+                maxCompOfAll = i;
+              }
+            }
+
+            numBiggestColor = maxCompOfAll;
+
+            if (DRAW) {
+              const int RADIUS_CENTR = 15;
+
+              for (int dx = -RADIUS_CENTR / 2; dx <= RADIUS_CENTR / 2; ++dx) {
+                  for (int dy = -RADIUS_CENTR; dy <= RADIUS_CENTR; ++dy) {
+                      if (c_mass[maxCompOfAll].x + dx < X_BEGIN || c_mass[maxCompOfAll].x + dx >= X_END ||
+                        c_mass[maxCompOfAll].y + dy >= Y_END || c_mass[maxCompOfAll].y + dy < Y_BEGIN) {
+                          continue;
+                      }
+
+                      setColorUV(uv, c_mass[maxCompOfAll].x + dx, c_mass[maxCompOfAll].y + dy, 0, 80);
+                      setColorUV(uv, c_mass[maxCompOfAll].x + dx, c_mass[maxCompOfAll].y + dy, 1, 80);
+                  }
+               }
+            }
+
+          /*  if (maxCompOfAll < 0) {
+                return CvPoint<int> { 0, 0 };
+            } */
+
+            return c_mass[maxCompOfAll];
         }
 
 

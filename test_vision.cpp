@@ -9,7 +9,7 @@
 
 bool DRAW = 1;
 
-robot::vision::CV_UV cam1(640, 420, "/dev/video0", DRAW);  //(1920, 1080); //1280, 720 (640, 420)
+robot::vision::CV_UV cam1(640, 420, "/dev/video1", DRAW);  //(1920, 1080); //1280, 720 (640, 420)
 
 #ifdef DISPLAY
   robot::vision::Display window1(cam1.getW(), cam1.getH());
@@ -28,6 +28,27 @@ void vision() {
     double startOneFTIme = time();
 
     cam1.handle_frame();
+
+    switch (cam1.getNumBiggestColor()) {
+      case 0:
+        message("blueAngle");
+        break;
+      case 1:
+        message("orangeAngle");
+        break;
+      case 2:
+        message("greenS");
+        break;
+      case 3:
+        message("redS");
+        break;
+      case 4:
+        message("yellowSquare");
+        break;
+      case 5:
+        message("blueBeam");
+        break;
+    }
 
     #ifdef DISPLAY
       if (DRAW) {
