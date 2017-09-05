@@ -84,11 +84,4 @@ void vision() {
 int main()
 {
     vision();
-
-
-    /*while(1) {
-      cam1.handle_frame();
-      wait(0.001);
-    }*/
-    //640, 420 -- 30 fps
 }
