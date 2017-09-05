@@ -1,7 +1,6 @@
 /* robot.cpp
  *
- * Author: Krylov Georgii (without class WheelBazeMore)
- * class WheelBazeMore autors: Krylov Georgii & Ilyasov Alexander
+ * Author: Krylov Georgii
  *
  * Contacts:
  * 			krylov.georgii@gmail.com
@@ -12,7 +11,6 @@
 #ifndef _ROBOT_CPP_
 #define _ROBOT_CPP_ "1.8"
 
-#include <functional>
 #include "robot.h"
 #include "button.h"
 #include "log.h"
@@ -234,7 +232,7 @@ robot::Pwm::Pwm(const Pin pwm_pin, int startPwm, const uint16_t frequency_divide
     initSucsess = true;
 };
 
- void robot::Pwm::pwmWrite(int newPwmValue) {
+inline void robot::Pwm::pwmWrite(int newPwmValue) {
 	if (newPwmValue < 0) {
 		newPwmValue = 0;
 	} else if (newPwmValue > frequencyDivider) {
@@ -245,24 +243,24 @@ robot::Pwm::Pwm(const Pin pwm_pin, int startPwm, const uint16_t frequency_divide
 	writeValue = newPwmValue;
 }
 
- int robot::Pwm::getPwmWrite() const {
+inline int robot::Pwm::getPwmWrite() const {
 	return writeValue;
 }
 
- bool robot::Pwm::getInitStatus() const {
+inline bool robot::Pwm::getInitStatus() const {
 	return initSucsess;
 }
 
- bool robot::Dio::getInitStatus() const {
+inline bool robot::Dio::getInitStatus() const {
 	return initSucsess;
 }
 
- bool robot::Dio::dioReadRaw() {
+inline bool robot::Dio::dioReadRaw() {
 	readValue = Dio_ReadBit(&dio);
 	return readValue;
 }
 
- bool robot::Dio::dioRead(const byte num_of_iter) {
+inline bool robot::Dio::dioRead(const byte num_of_iter) {
 	signed char numOfHigh = 0;
 
 	for(unsigned int cntr = 0; cntr < num_of_iter; ++cntr) {
@@ -282,16 +280,16 @@ robot::Pwm::Pwm(const Pin pwm_pin, int startPwm, const uint16_t frequency_divide
 	return 0;
 }
 
- bool robot::Dio::getDioRead() const {
+inline bool robot::Dio::getDioRead() const {
 	return readValue;
 }
 
- void robot::Dio::dioWrite(const bool newValue) {
+inline void robot::Dio::dioWrite(const bool newValue) {
 	Dio_WriteBit(&dio, newValue);
 	writeValue = newValue;
 }
 
- bool robot::Dio::getDioWrite() const {
+inline bool robot::Dio::getDioWrite() const {
 	return writeValue;
 }
 
@@ -362,21 +360,21 @@ robot::Dio::Dio(const Pin dio_pin, const bool startValue) {
 	initSucsess = true;
 };
 
- void robot::Aio::setMinMaxVal(const double min, const double max) {
+inline void robot::Aio::setMinMaxVal(const double min, const double max) {
 	maxVal = max;
 	minVal = min;
 }
 
- bool robot::Aio::getInitStatus() const {
+inline bool robot::Aio::getInitStatus() const {
 	return initSucsess;
 }
 
- double robot::Aio::aioReadRaw() {
+inline double robot::Aio::aioReadRaw() {
 	readValue = Aio_Read(&aio);
 	return readValue;
 }
 
- double robot::Aio::aioRead(const unsigned int ITER_READ_SEN, const byte NUM_READ_SEN) {
+inline double robot::Aio::aioRead(const unsigned int ITER_READ_SEN, const byte NUM_READ_SEN) {
 	if(NUM_READ_SEN == 0) {
 		return 0;
 	}
@@ -410,12 +408,12 @@ robot::Dio::Dio(const Pin dio_pin, const bool startValue) {
 	return ai_val;
 }
 
- double robot::Aio::aioReadNorm(const double max_val, const double min_val,
+inline double robot::Aio::aioReadNorm(const double max_val, const double min_val,
 		const unsigned int ITER_READ_SEN, const byte NUM_READ_SEN) {
 	 return  (aioRead(ITER_READ_SEN, NUM_READ_SEN) - min_val) / (max_val - min_val);
 }
 
-double robot::Aio::aioReadNorm(const bool useRAW,
+inline double robot::Aio::aioReadNorm(const bool useRAW,
 		const unsigned int ITER_READ_SEN, const byte NUM_READ_SEN) {
 	if (useRAW) {
 		return  (aioReadRaw() - minVal) / (maxVal - minVal);
@@ -424,16 +422,16 @@ double robot::Aio::aioReadNorm(const bool useRAW,
 	return  (aioRead(ITER_READ_SEN, NUM_READ_SEN) - minVal) / (maxVal - minVal);
 }
 
- double robot::Aio::getAioRead() const {
+inline double robot::Aio::getAioRead() const {
 	return readValue;
 }
 
- void robot::Aio::aioWrite(const double newValue) {
+inline void robot::Aio::aioWrite(const double newValue) {
 	Aio_Write(&aio, newValue);
 	writeValue = newValue;
 }
 
- double robot::Aio::getAioWrite() const {
+inline double robot::Aio::getAioWrite() const {
 	return writeValue;
 }
 
@@ -558,118 +556,11 @@ robot::Aio::Aio(const Pin aio_pin, const double max_val, const double min_val, c
 	initSucsess = true;
 };
 
-int robot::lightSensor::setRideToLine(uint8_t senPos) {
-	switch (senPos) {
-	case SEN_POS::BEF_OFF :
-		return 1;
-	case SEN_POS::AFT_OFF :
-		return -1;
-	default :
-		return 0;
-	}
+inline uint32_t robot::Enc::encRead() {
+	return Encoder_Counter(&enc);
 }
 
-int robot::lightSensor::sureLine() {
-	double senVal = aioReadNorm();
-
-	if (senVal > 0.7)
-		return 1;
-	if (senVal < 0.3)
-		return 0;
-	return -1;
-}
-
-int robot::lightSensor::onLine() {
-	return aioReadNorm() < 0.5 ? 0 : 1;
-}
-
-int robot::lightSensor::offLine() {
-	return aioReadNorm() < 0.5 ? 1 : 0;
-}
-
-uint8_t robot::lightSensor::getSenPos (double speed) {
-	if (onLine() == 1) {
-		switch (senPos) {
-		case SEN_POS::BEF_OFF :
-			return SEN_POS::BEF_ON;
-		case SEN_POS::AFT_OFF :
-			return SEN_POS::AFT_ON;
-		}
-	}
-
-	else if (onLine() == 0){
-		if (senPos == SEN_POS::BEF_ON || senPos == SEN_POS::AFT_ON) {
-			message("Moved from line");
-			if (speed < 0.)
-				return SEN_POS::BEF_OFF;
-			else if (speed > 0.)
-				return SEN_POS::AFT_OFF;
-		}
-	}
-
-	return senPos;
-}
-
-int robot::lightSensor::setRideToLine() {
-	switch (senPos) {
-	case SEN_POS::BEF_OFF :
-		return 1;
-	case SEN_POS::AFT_OFF :
-		return -1;
-	default :
-		return 0;
-	}
-}
-
-void robot::lightSensor::printPos(uint8_t sen, uint8_t senPos) {
-	std::string s;
-	switch (sen) {
-	case SEN::MID_L : {
-		s += "MID_L - ";
-		break;
-	}
-	case SEN::MID_R : {
-		s += "MID_R - ";
-		break;
-	}
-	default : {
-		s += "Other sen - ";
-		break;
-	}
-	}
-
-	switch(senPos) {
-	case SEN_POS::BEF_OFF : {
-		s += "BEF_OFF";
-		break;
-	}
-	case SEN_POS::BEF_ON : {
-		s += "BEF_ON";
-		break;
-	}
-	case SEN_POS::AFT_OFF : {
-		s += "AFT_OFF";
-		break;
-	}
-	case SEN_POS::AFT_ON : {
-		s += "AFT_ON";
-		break;
-	}
-	}
-	message(s);
-}
-
-void robot::lightSensor::setSenPos(uint8_t newPos) {
-	senPos = newPos;
-}
-
-
-
- int32_t robot::Enc::encRead() {
-	return static_cast<int32_t>(Encoder_Counter(&enc));
-}
-
- bool robot::Enc::getInitStatus() const {
+inline bool robot::Enc::getInitStatus() const {
 	return initSucsess;
 }
 
@@ -827,11 +718,11 @@ robot::Motor::~Motor() {
 	if (encoder != nullptr) { delete encoder; }
 };
 
- bool robot::Motor::isEnc() const {
+inline bool robot::Motor::isEnc() const {
 	return isEncoder;
 }
 
- int32_t robot::Motor::getEncRawVal() const {
+inline uint32_t robot::Motor::getEncRawVal() const {
 	if (encoder == nullptr) {
 		message("no Enc to read");
 		return 0;
@@ -844,7 +735,7 @@ robot::Motor::~Motor() {
 	return encoder->encRead();
 }
 
- int32_t robot::Motor::getEncVal() const {
+inline uint32_t robot::Motor::getEncVal() const {
 	if (encoder == nullptr) {
 		message("no Enc to read");
 		return 0;
@@ -854,21 +745,15 @@ robot::Motor::~Motor() {
 	return getEncRawVal() - old_enc;
 }
 
- double robot::Motor::getAngleVal() const {
+inline double robot::Motor::getAngleVal() const {
 	return enc_degr(getEncVal());
 }
 
- double robot::Motor::getLengthVal() const {
+inline double robot::Motor::getLengthVal() const {
 	return enc_length(getEncVal());
 }
 
- double robot::Motor::getSpeed(double oldTime, double nowTime, double oldEnc, double nowEnc) const {
- 	if (oldEnc > nowEnc)
- 		return -enc_length(fabs(nowEnc - oldEnc)) / (nowTime - oldTime);
- 	return enc_length(fabs(nowEnc - oldEnc)) / (nowTime - oldTime);
- }
-
- void robot::Motor::setPower(double newPower) const {
+inline void robot::Motor::setPower(double newPower) const {
 	bool dioValue = 0;
 
 	if ((newPower < 0 && !pwm_isReversed) || (newPower > 0 && pwm_isReversed)) {
@@ -898,7 +783,7 @@ robot::Motor::~Motor() {
 	}
 }
 
- void robot::Motor::setRawPower(int newPower) const {
+inline void robot::Motor::setRawPower(int newPower) const {
 	bool dioValue = 0;
 
 	if ((newPower < 0 && !pwm_isReversed) || (newPower > 0 && pwm_isReversed)) {
@@ -922,7 +807,7 @@ robot::Motor::~Motor() {
 	}
 }
 
- int robot::Motor::getSetRawPower() const {
+inline int robot::Motor::getSetRawPower() const {
 	int power = 0;
 
 	if (pwm_power != nullptr) {
@@ -947,7 +832,7 @@ robot::Motor::~Motor() {
 	return power;
 }
 
- int32_t robot::Motor::degr_enc(const double degr) const {
+inline uint32_t robot::Motor::degr_enc(const double degr) const {
 	if (encoder == nullptr) {
 		message("no encoder on this motor! degr_edc(" << degr << ")");
 	}
@@ -955,44 +840,44 @@ robot::Motor::~Motor() {
 	return degr * encInDegr + 0.5;
 }
 
- double robot::Motor::enc_degr(const int32_t enc_val) const {
-	return static_cast<int>(enc_val) / encInDegr;
+inline double robot::Motor::enc_degr(const uint32_t enc_val) const {
+	return static_cast<int>(enc_val / encInDegr);
 }
 
- int32_t robot::Motor::length_enc(const double length, const double whl_diam) const {
+inline uint32_t robot::Motor::length_enc(const double length, const double whl_diam) const {
 	return degr_enc(360 * length / (whl_diam * PI));
 }
 
- double robot::Motor::enc_length(const int32_t enc_val) const {
+inline double robot::Motor::enc_length(const uint32_t enc_val) const {
 	return enc_degr(enc_val) * wheelDiam * PI / 360;
 }
 
- int32_t robot::Motor::length_enc(const double length) const {
+inline uint32_t robot::Motor::length_enc(const double length) const {
 	return length_enc (length, wheelDiam);
 }
 
- void robot::Motor::reverseMotorPower() {
+inline void robot::Motor::reverseMotorPower() {
 	int power = getSetRawPower();
 	pwm_isReversed = !pwm_isReversed;
 	setRawPower(power);
 }
 
- void robot::Motor::reverseEncoder() {
+inline void robot::Motor::reverseEncoder() {
 	enc_isReversed = !enc_isReversed;
 }
 
- void robot::Motor::reverseMotor() {
+inline void robot::Motor::reverseMotor() {
 	reverseMotorPower();
 	reverseEncoder();
 }
 
- void robot::Motor::setPID_angle(const double P, const double I, const double D) {
+inline void robot::Motor::setPID_angle(const double P, const double I, const double D) {
 	P_angle = P;
 	I_angle = I;
 	D_angle = D;
 }
 
- void robot::Motor::setPID_length(const double P, const double I, const double D) {
+inline void robot::Motor::setPID_length(const double P, const double I, const double D) {
 	P_length = P;
 	I_length = I;
 	D_length = D;
@@ -1022,7 +907,7 @@ robot::WheelBaze::~WheelBaze() {
 	if (R_mtr != nullptr) { delete R_mtr; }
 };
 
- double robot::WheelBaze::enc_length(const int32_t enc_value) const {
+inline double robot::WheelBaze::enc_length(const uint32_t enc_value) const {
 	if (L_mtr != nullptr) {
 		return L_mtr->enc_length(enc_value);
 	}
@@ -1035,7 +920,7 @@ robot::WheelBaze::~WheelBaze() {
 	return 0;
 }
 
- int32_t robot::WheelBaze::length_enc(const double length) const {
+inline uint32_t robot::WheelBaze::length_enc(const double length) const {
 	if (L_mtr != nullptr) {
 		return L_mtr->length_enc(length);
 	}
@@ -1048,19 +933,19 @@ robot::WheelBaze::~WheelBaze() {
 	return 0;
 }
 
- double robot::WheelBaze::enc_robotDegr(const int32_t enc_value) const {
+inline double robot::WheelBaze::enc_robotDegr(const uint32_t enc_value) const {
 	return enc_length(enc_value) * 360 / (robotDiam * PI);
 }
 
- int32_t robot::WheelBaze::robotDegr_enc(const double rbt_degr, const double rbt_diam) const {
+inline uint32_t robot::WheelBaze::robotDegr_enc(const double rbt_degr, const double rbt_diam) const {
 	return length_enc(rbt_degr * rbt_diam * PI / 360);
 }
 
- int32_t robot::WheelBaze::robotDegr_enc(const double rbt_degr) const {
+inline uint32_t robot::WheelBaze::robotDegr_enc(const double rbt_degr) const {
 	return robotDegr_enc(rbt_degr, robotDiam);
 }
 
- void robot::WheelBaze::ride(const double L_power, const double R_power) const {
+inline void robot::WheelBaze::ride(const double L_power, const double R_power) const {
 	if (L_mtr != nullptr) {
 		L_mtr->setPower(L_power);
 	} else {
@@ -1074,34 +959,32 @@ robot::WheelBaze::~WheelBaze() {
 	}
 }
 
- void robot::WheelBaze::ride(const double power) const {
+inline void robot::WheelBaze::ride(const double power) const {
 	ride(power, power);
 }
 
- void robot::WheelBaze::stop(const double waitTime) const {
+inline void robot::WheelBaze::stop(const double waitTime) const {
 	ride(0);
 	wait(waitTime, false);
 }
 
- void robot::WheelBaze::rideStr(int32_t L_enc, int32_t R_enc, const double power, const double P) const {
-	ride(power + (static_cast<int>(R_enc) - static_cast<int>(L_enc)) * P,
-			power + (static_cast<int>(L_enc) - static_cast<int>(R_enc)) * P);
-	//message(R_enc) - static_cast<int>(L_enc)) * P);
+inline void robot::WheelBaze::rideStr(uint32_t L_enc, uint32_t R_enc, const double power, const double P) const {
+	ride(power + (R_enc - L_enc) * P, power + (L_enc - R_enc) * P);
 }
 
- void robot::WheelBaze::rideStr(const double power, const double P) const {
+inline void robot::WheelBaze::rideStr(const double power, const double P) const {
 	rideStr(L_enc(), R_enc(), power, P);
 }
 
- void robot::WheelBaze::rideStr(const double power) const {
+inline void robot::WheelBaze::rideStr(const double power) const {
 	rideStr(L_enc(), R_enc(), power, P_rideStr);
 }
 
- void robot::WheelBaze::setP_rideStr(const double P) {
+inline void robot::WheelBaze::setP_rideStr(const double P) {
 	P_rideStr = P;
 }
 
- int32_t robot::WheelBaze::encRaw(Motor *mtr) const {
+inline uint32_t robot::WheelBaze::encRaw(Motor *mtr) const {
 	if (mtr == nullptr) {
 		message("no Motor to encRaw(mtr)");
 		return 0;
@@ -1113,7 +996,7 @@ robot::WheelBaze::~WheelBaze() {
 	return mtr->getEncRawVal();
 }
 
-int robot::WheelBaze::enc(Motor *mtr) const {
+inline int robot::WheelBaze::enc(Motor *mtr) const {
 	if (mtr == nullptr) {
 		message("no Motor to encRaw(mtr)");
 		return 0;
@@ -1122,10 +1005,10 @@ int robot::WheelBaze::enc(Motor *mtr) const {
 		return 0;
 	}
 
-	return static_cast<int>(mtr->getEncVal());
+	return mtr->getEncVal();
 }
 
- int robot::WheelBaze::ang(Motor *mtr) const {
+int robot::WheelBaze::ang(Motor *mtr){
 	if (mtr == nullptr){
 		message("no Motor to encRaw(mtr)");
 		return 0;
@@ -1137,39 +1020,39 @@ int robot::WheelBaze::enc(Motor *mtr) const {
 	return mtr->getAngleVal();
 }
 
- int32_t robot::WheelBaze::L_encRaw() const {
+uint32_t robot::WheelBaze::L_encRaw(){
 	return encRaw(L_mtr);
 }
 
- int32_t robot::WheelBaze::R_encRaw() const {
+inline uint32_t robot::WheelBaze::R_encRaw() const {
 	return encRaw(R_mtr);
 }
 
- int robot::WheelBaze::L_enc() const {
+inline uint32_t robot::WheelBaze::L_enc() const {
 	return enc(L_mtr);
 }
 
- int32_t robot::WheelBaze::R_enc() const {
+inline uint32_t robot::WheelBaze::R_enc() const {
 	return enc(R_mtr);
 }
 
-double robot::WheelBaze::L_ang() const {
+double robot::WheelBaze::L_ang(){
 	return ang(L_mtr);
 }
 
-double robot::WheelBaze::R_ang() const {
+double robot::WheelBaze::R_ang(){
 	return ang(R_mtr);
 }
 
-void robot::WheelBaze::L_encRes() const {
+void robot::WheelBaze::L_encRes(){
 	encRes(L_mtr);
 }
 
- void robot::WheelBaze::R_encRes() const {
+inline void robot::WheelBaze::R_encRes() const {
 	encRes(R_mtr);
 }
 
- void robot::WheelBaze::encRes(Motor *mtr) const {
+inline void robot::WheelBaze::encRes(Motor *mtr) const {
 	if (mtr == nullptr) {
 		message("no Motor to encRes(mtr)");
 	} else {
@@ -1179,29 +1062,16 @@ void robot::WheelBaze::L_encRes() const {
 	wait(0.01);
 }
 
-void robot::WheelBaze::turn(const double L_power, const double R_power) const {
- 	ride(L_power, R_power);
- }
+void robot::WheelBaze::move( double lFinishTarget, double rFinishTarget, double turnSpeed, int (* checkFunc)()) {
+	cdouble StartTarget = 0;
+	//cdouble lFinishTarget = angle;
+	//cdouble rFinishTarget = - angle;
+	cdouble lTurnSpeed = lFinishTarget > 0 ? turnSpeed : -turnSpeed;
+	cdouble rTurnSpeed = rFinishTarget > 0 ? turnSpeed : -turnSpeed;
+	cdouble Bias = 0.5;
+	cdouble Timeout = 1.5;
+	cdouble AligTime = 2;
 
-void robot::WheelBaze::turn(const double power) const {
- 	turn(power, -power);
- }
-
-void robot::WheelBazeMore::move(double lFinishTarget, double rFinishTarget, double turnSpeed, std::function<uint8_t()> && checkFunc) const {
-	move(lFinishTarget, rFinishTarget, turnSpeed, checkFunc);
-}
-
-void robot::WheelBazeMore::move(double lAng, double rAng, double turnSpeed, std::function<uint8_t()> & checkFunc) const {
-	const double lStartTarget = L_ang(), rStartTarget = R_ang();
-	//const double lFinishTarget = angle;
-	//const double rFinishTarget = - angle;
-	const double lFinishTarget = lAng + lStartTarget;
-	const double rFinishTarget = rAng + rStartTarget;
-	const double lTurnSpeed = lFinishTarget > lStartTarget ? turnSpeed : -turnSpeed;
-	const double rTurnSpeed = rFinishTarget > rStartTarget ? turnSpeed : -turnSpeed;
-	const double Bias = 2;
-	const double Timeout = 1.5;
-	const double AligTime = 2;
 
 	bool lFlag = false;
 	bool rFlag = false;
@@ -1211,10 +1081,10 @@ void robot::WheelBazeMore::move(double lAng, double rAng, double turnSpeed, std:
 	double newTime = startTime;
 	bool lBig = true, rBig = true;
 
-	for (double lCurrentTarget = lStartTarget, rCurrentTarget = rStartTarget; !lFlag || lBig || !rFlag || rBig;
+	for (double lCurrentTarget = StartTarget, rCurrentTarget = StartTarget; !lFlag || lBig || !rFlag || rBig;
 		wait(0.01), lBig = fabs(L_mtr->holdTargetAngle(lCurrentTarget)) > Bias, rBig = fabs(R_mtr->holdTargetAngle(rCurrentTarget)) > Bias) {
-	  	if ( lTurnSpeed > 0 ? lCurrentTarget < lFinishTarget : lCurrentTarget > lFinishTarget ) {
-	  		lCurrentTarget = lStartTarget + lTurnSpeed * (newTime - startTime);
+	  	if ( fabs(lCurrentTarget) < fabs(lFinishTarget) ) {
+	  		lCurrentTarget = StartTarget + lTurnSpeed * (newTime - startTime);
 	  	} else if (!lFlag) {
 	  		lCurrentTarget = lFinishTarget;
 	   		lFlag = true;
@@ -1224,9 +1094,9 @@ void robot::WheelBazeMore::move(double lAng, double rAng, double turnSpeed, std:
 	   		break;
 	  	}
 
-	  	if ( rTurnSpeed > 0 ? rCurrentTarget < rFinishTarget : rCurrentTarget > rFinishTarget ) {
-	  		rCurrentTarget = rStartTarget + rTurnSpeed * (newTime - startTime);
-	  	} else if (!rFlag) {
+	  	if ( fabs(rCurrentTarget) < fabs(rFinishTarget) ) {
+	  		rCurrentTarget = StartTarget + rTurnSpeed * (newTime - startTime);
+	  	} else if (!lFlag) {
 	  		rCurrentTarget = rFinishTarget;
 	  		rFlag = true;
 	  		rStartExtraTime = newTime;
@@ -1236,32 +1106,25 @@ void robot::WheelBazeMore::move(double lAng, double rAng, double turnSpeed, std:
 	  	}
 	  	newTime = time();
 
+
+
 	  	if (checkFunc()) {
 
 	  		stop();
 	  		message("escape by checkFunc");
 	  		return;
 	  	}
-	  	//message("R - " << R_ang() << ", L - " << L_ang());
 	 }
 
  	for (newTime = time(); newTime + AligTime > time(); wait(0.01)) {
- 		L_mtr->holdTargetAngle(lFinishTarget);//, 30, 20, 15);
- 		R_mtr->holdTargetAngle(rFinishTarget);//, 30, 20, 15);
- 		if (checkFunc()) {
- 			stop();
- 			message("escape by checkFunc");
- 			return;
- 		}
+ 		L_mtr->holdTargetAngle(lFinishTarget, 30, 20, 15);
+ 		R_mtr->holdTargetAngle(rFinishTarget, 30, 20, 15);
  	}
+
  	stop();
 }
 
-void robot::WheelBazeMore::turnAng(double angle, double speed, std::function<uint8_t()> && checkFunc) {
-	turnAng(angle, speed, checkFunc);
-}
-
-void robot::WheelBazeMore::turnAng(double angle, double speed, std::function<uint8_t()> & checkFunc)
+void robot::WheelBaze::turnAng( double angle, double speed, int (* checkFunc)())
 {
 	if (angle == 0.)
 		return;
@@ -1273,116 +1136,49 @@ void robot::WheelBazeMore::turnAng(double angle, double speed, std::function<uin
 	move(goal, - goal, goalSpeed, checkFunc);
 }
 
-void robot::WheelBazeMore::moveStr( double dist, double speed, std::function<uint8_t()> & checkFunc) //int (* checkFunc)())
+void robot::WheelBaze::moveStr( double dist, double speed )
 {
 	if (dist == 0.)
 		return;
 
 	double goal = dist * 2 / wheelDiam / PI * 180;
 	double goalSpeed = speed * 2 / wheelDiam / PI * 180;
-	move(goal, goal, goalSpeed, checkFunc);
+	move(goal, goal, goalSpeed);
 }
 
-void robot::WheelBazeMore::moveStr( double dist, double speed, std::function<uint8_t()> && checkFunc) {
-	robot::WheelBazeMore::moveStr(dist, speed, checkFunc);
-}
-
-void robot::WheelBazeMore::followLine(double lSenValue, double rSenValue, double k, double power) {
+void robot::WheelBaze::followLine(double lSenValue, double rSenValue, double k, double power) {
 	double err = rSenValue - lSenValue;
 
-	L_mtr->setPower(power + k * err);
-	R_mtr->setPower(power - k * err);
+	L_mtr->setPower(power - k * err);
+	R_mtr->setPower(power + k * err);
 }
-
-void robot::WheelBazeMore::followLineSpeed(double lSenValue, double rSenValue, double k, double speed, double deltaTime) {
-	double err = rSenValue - lSenValue;
-	if (rSenValue + lSenValue > 1.5)
-		err = 0;
-	double speedAng = L_mtr->enc_degr(length_enc(fabs(speed))) * (speed >= 0 ? 1 : (-1));
-	L_mtr->setPID_angle((20 + k*err), (20 + k*err), (5 + k*err));
-	R_mtr->setPID_angle((20 - k*err), (20 - k*err), (5 - k*err));
-	L_mtr->holdTargetAngle(L_mtr->getLastTarget() + speedAng * deltaTime);
-	R_mtr->holdTargetAngle(R_mtr->getLastTarget() + speedAng * deltaTime);
-	//message("L - " << L_mtr->holdTargetAngle(L_mtr->getLastTarget() + speedAng * deltaTime) << // + k * err);
-		//	", R - " << R_mtr->holdTargetAngle(R_mtr->getLastTarget() + speedAng * deltaTime));// - k * err);
-	//message(k * err);
-}
-
-void robot::WheelBazeMore::followLineSpeed2(double lSenValue, double rSenValue, double k, double speed, double deltaTime) {
-	double err = (rSenValue - lSenValue) * (speed >= 0 ? 1 : (-1));
-	if (rSenValue + lSenValue > 1.5)
-		err = 0;
-	double speedAng = L_mtr->enc_degr(length_enc(fabs(speed))) * (speed >= 0 ? 1 : (-1));
-	L_mtr->holdTargetAngle(L_mtr->getLastTarget() + speedAng * deltaTime + err * k * fabs(speed));
-	R_mtr->holdTargetAngle(R_mtr->getLastTarget() + speedAng * deltaTime - err * k * fabs(speed));
-	//message("L - " << L_mtr->holdTargetAngle(L_mtr->getLastTarget() + speedAng * deltaTime) << // + k * err);
-		//	", R - " << R_mtr->holdTargetAngle(R_mtr->getLastTarget() + speedAng * deltaTime));// - k * err);
-	//message(k * err);
-}
-
-void robot::WheelBazeMore::initLight(const double dist, const double power,	robot::Aio * sen[], const int kp_str) {
-	double distAng = L_mtr->enc_degr(length_enc(dist));
-	message(distAng);
-	message(L_ang() << R_ang());
-	double Val[6], minVal[6], maxVal[6] = {0};
-	for (int i = 0; i < 6; i++) {
-		minVal[i] = sen[i]->aioRead();
-	}
-
-	moveStr(dist, power, [&]()->uint8_t {
-		for (int i = 0; i < 6; i++) {
-			Val[i] = sen[i]->aioRead();
-		}
-
-		for (int i = 0; i < 6; i++) {
-			minVal[i] = std::min(minVal[i], Val[i]);
-		}
-
-		for (int i = 0; i < 6; i++) {
-			maxVal[i] = std::max(maxVal[i], Val[i]);
-		}
-
-		return fabs(L_ang() + R_ang()) > distAng * 2 ? 1 : 0;
-	});
-
-	 for (int i = 0; i < 6; i++) {
-	 	sen[i]->setMinMaxVal(minVal[i], maxVal[i]);
-	 	message("SEN " << i << "  " << minVal[i] << "  " << maxVal[i]);
-	 }
-}
-
 
 void robot::Motor::encRes(){
 	old_enc = getEncRawVal();
 	sumErr = 0.;
 	sumErrAng = 0.;
-	oldErrDegr = 0.;
-	setLastTarget(0);
 	wait(0.01);
 }
 
- float robot::Motor::holdTargetAngle(const double target_angle,
+inline float robot::Motor::holdTargetAngle(const double target_angle,
 		const double P, const double I, const double D, const double dopPower, const char sign) {
 	double err = target_angle - enc_degr(getEncVal());
 	double d_comp = 0;
 	double newTime = time();
-	lastTarget = target_angle;
 
 	if (newTime - oldTimeAng >= Timeout_PID) oldTimeAng = newTime;
 
 	if (fabs(err - oldErrDegr) > 1) sumErrAng = 0;
 	else sumErrAng += err * (newTime - oldTimeAng) * I;
 
-	if (iCompToZero) {
-		if ((err > 0 && oldErrDegr < 0) || (err < 0 && oldErrDegr > 0)) sumErrAng = 0;
-		if ((err > 0 && sumErrAng < 0) || (err < 0 && sumErrAng > 0)) sumErrAng = 0;
-	}
+	if ((err > 0 && oldErrDegr < 0) || (err < 0 && oldErrDegr > 0)) sumErrAng = 0;
+	if ((err > 0 && sumErr < 0) || (err < 0 && sumErrAng > 0)) sumErrAng = 0;
 
 	if (oldTimeAng == newTime){
 		d_comp = 0;
 		sumErrAng = 0;
 	}else if(newTime - oldTimeAng > MinTime_D){
-		d_comp = (err - oldErrDegr) / (newTime - oldTimeAng) * D;
+		d_comp = (oldErrDegr - err) / (newTime - oldTimeAng) * D;
 	}
 
 	if (sign == -1 && err * P + sumErrAng + d_comp + dopPower > 0) setPower(0.);
@@ -1392,26 +1188,26 @@ void robot::Motor::encRes(){
 	oldTimeAng = newTime;
 	oldErrDegr = err;
 
-	return err;// * P + sumErrAng + d_comp;
+	return err;
 }
 
- float robot::Motor::holdTargetAngle(const double  target_angle, const double dopPower, const char sign) {
+inline float robot::Motor::holdTargetAngle(const double  target_angle, const double dopPower, const char sign) {
 	return holdTargetAngle(target_angle, P_angle, I_angle, D_angle, dopPower, sign);
 }
 
- void robot::Motor::setTimeout_PID(const double timeout) {
+inline void robot::Motor::setTimeout_PID(const double timeout) {
 	Timeout_PID = timeout;
 }
 
- void robot::Motor::setMinTime_D(const double minTime) {
+inline void robot::Motor::setMinTime_D(const double minTime) {
 	MinTime_D = minTime;
 }
 
- void robot::Motor::setMinPwmToSpin(const int newPwm) {
+inline void robot::Motor::setMinPwmToSpin(const int newPwm) {
 	minPwmToSpin = newPwm;
 }
 
- float robot::Motor::holdTargetLength(const double target_length,
+inline float robot::Motor::holdTargetLength(const double target_length,
 		const double P, const double I, const double D) {
 	double err = target_length - enc_length(getEncVal());
 	double newTime = time();
@@ -1426,14 +1222,12 @@ void robot::Motor::encRes(){
 		sumErr += err * (newTime - oldTime) * I;
 	}
 
-	if (iCompToZero) {
-		if ((err > 0 && oldErrLength < 0) || (err < 0 && oldErrLength > 0)) {
-			sumErr = 0;
-		}
+	if ((err > 0 && oldErrLength < 0) || (err < 0 && oldErrLength > 0)) {
+		sumErr = 0;
+	}
 
-		if ((err > 0 && sumErr < 0) || (err < 0 && sumErr > 0)) {
-			sumErr = 0;
-		}
+	if ((err > 0 && sumErr < 0) || (err < 0 && sumErr > 0)) {
+		sumErr = 0;
 	}
 
 	setPower(err * P + sumErr);
@@ -1443,31 +1237,11 @@ void robot::Motor::encRes(){
 	return err;
 }
 
- float robot::Motor::holdTargetLength(const double target_length) {
+inline float robot::Motor::holdTargetLength(const double target_length) {
 	return  holdTargetLength(target_length, P_length, I_length, D_length);
 }
 
-double robot::Motor::getLastTarget() {
-	return lastTarget;
-}
-
-void robot::Motor::setLastTarget(const double newTarget) {
- 	lastTarget = newTarget;
-}
-
-void robot::Motor::setICompToZero(const bool setToZero) {
-	iCompToZero = setToZero;
-}
-
-void robot::Motor::PIDRes() {
-	sumErr = 0.;
-	sumErrAng = 0.;
-	oldErrDegr = 0.;
-	setLastTarget(0);
-	wait(0.01);
-}
-
-float robot::Motor::holdTarget(const double target, const double now_val, const double P, const double I, const double D) {
+float robot::Motor::holdTarget(cdouble & target, cdouble & now_val, cdouble & P, cdouble & I, cdouble & D){
 	double err = target - now_val;
 	double newTime = time();
 	double d_comp = 0;
@@ -1495,85 +1269,17 @@ float robot::Motor::holdTarget(const double target, const double now_val, const 
 	return err * P + sumErr + d_comp;
 }
 
-float robot::Motor::holdTarget(const double target, const double now_val){
+float robot::Motor::holdTarget(cdouble & target, cdouble & now_val){
 	return holdTarget(target, now_val, P_length, I_length, D_length);
 }
 
-void robot::Motor::moveStr(double length, double speed, std::function<uint8_t()> && checkFunc) {
-	moveStr(length, speed, checkFunc);
-}
-
-void robot::Motor::moveStr(double length, double speed, std::function<uint8_t()> & checkFunc) {
-	double goal = length * 2 / wheelDiam / PI * 180;
-	double goalSpeed = speed * 2 / wheelDiam / PI * 180;
-
-	turnAng(goal, goalSpeed, checkFunc);
-}
-
-void robot::Motor::turnAng(double finishTarget, double turnSpeed, std::function<uint8_t()> && checkFunc) {
-	turnAng(finishTarget, turnSpeed, checkFunc);
-}
-
-void robot::Motor::turnAng(double finishTarget, double TurnSpeed, std::function<uint8_t()> & checkFunc) {
-	const double startTarget = getAngleVal();
-	//const double lFinishTarget = angle;
-	//const double rFinishTarget = - angle;
-	const double turnSpeed = finishTarget > startTarget ? TurnSpeed : -TurnSpeed;
-	const double Bias = 1;
-	const double Timeout = 1.5;
-	const double AligTime = 2;
-
-
-	bool flag = false;
-	double startExtraTime = 0;
-	double startTime = time();
-	double newTime = startTime;
-	bool big = true;
-	setICompToZero(false);
-
-	for (double currentTarget = startTarget; !flag || big;
-		wait(0.01), big = fabs(this->holdTargetAngle(currentTarget)) > Bias) {
-	  	if ( turnSpeed < 0 ? currentTarget > finishTarget : currentTarget < finishTarget) {
-	  		currentTarget = startTarget + turnSpeed * (newTime - startTime);
-	  	} else if (!flag) {
-	  		currentTarget = finishTarget;
-	   		flag = true;
-	   		startExtraTime = newTime;
-	  	} else if (newTime - startExtraTime > Timeout) {
-	   		message("timeout");
-	   		break;
-	  	}
-
-	  	newTime = time();
-	  	setLastTarget(currentTarget);
-	  	//message(getAngleVal());
-
-	  	if (checkFunc()) {
-	  		setPower(0);
-	  		message("escape by checkFunc");
-	  		return;
-	  	}
-	 }
-
-	setICompToZero(true);
- 	for (newTime = time(); newTime + AligTime > time(); wait(0.01)) {
- 		this->holdTargetAngle(finishTarget);//, 30, 20, 15);
- 		if (checkFunc()) {
- 			setPower(0);
- 			message("escape by checkFunc");
- 			return;
- 		}
- 	}
- 	setPower(0);
-}
-
-void robot::WheelBaze::encRes() const {
+void robot::WheelBaze::encRes(){
 	L_encRes();
 	R_encRes();
 	wait(0.1);
 }
 
- int robot::WheelBaze::enc(const bool L_enc_inv, const bool R_enc_inv) const {
+inline int robot::WheelBaze::enc(const bool L_enc_inv, const bool R_enc_inv) const {
 	bool L_isEnc = false;
 	bool R_isEnc = false;
 
@@ -1606,15 +1312,49 @@ void robot::WheelBaze::encRes() const {
 	return 0;
 }
 
- robot::Motor* robot::WheelBaze::L() {
+robot::Motor* robot::WheelBaze::L(){
 	return L_mtr;
 }
 
- robot::Motor* robot::WheelBaze::R() {
+robot::Motor* robot::WheelBaze::R(){
 	return R_mtr;
 }
 
-void robot::Servo::setRawPwm(const int pwm_value) const {
+void robot::WheelBaze::turn(const double & L_power, const double & R_power){
+	ride(L_power, R_power);
+}
+
+void robot::WheelBaze::turn(const double & power){
+	turn(power, -power);
+}
+
+void robot::WheelBaze::initLight(cdouble & dist, cdouble & power, robot::Aio & LSen, robot::Aio & RSen){
+	double distAng = dist / 7.5 / PI * 360;
+	double LVal, RVal, lEncVal, rEncVal, rMinV = RSen.aioRead(), rMaxV = 0, lMinV = LSen.aioRead(), lMaxV = 0;
+	while (abs((lEncVal = L_ang()) + (rEncVal = R_ang())) / 2 < distAng) {
+		LVal = LSen.aioRead();
+		RVal = RSen.aioRead();
+
+		lMinV = std::min(lMinV, LVal);
+	 	lMaxV = std::max(lMaxV, LVal);
+
+	 	rMinV = std::min(rMinV, RVal);
+	 	rMaxV = std::max(rMaxV, RVal);
+
+	 	//message("L sensor -- " << LVal << ", R sensor -- " << RVal);
+	 	rideStr(power, 35);
+	 	wait(0.005);
+	 }
+
+	 stop();
+	 message("L min -- " << lMinV << ", L max -- " << lMaxV);
+	 message("R min -- " << rMinV << ", R max -- " << rMaxV);
+
+	 LSen.setMinMaxVal(lMinV, lMaxV);
+	 RSen.setMinMaxVal(rMinV, rMaxV);
+}
+
+void robot::Servo::setRawPwm(const int pwm_value){
 	if (pwm == nullptr){
 		message("no Pwm pwm to setRawPwm(" << pwm_value << ")");
 		return;
@@ -1623,8 +1363,8 @@ void robot::Servo::setRawPwm(const int pwm_value) const {
 	pwm->pwmWrite(pwm_value);
 }
 
- int robot::Servo::getSetRawPwm() const {
-	if (pwm == nullptr) {
+int robot::Servo::getSetRawPwm(){
+	if (pwm == nullptr){
 		message("no Pwm pwm to getSetRawPwm()");
 		return 0;
 	}
@@ -1632,24 +1372,23 @@ void robot::Servo::setRawPwm(const int pwm_value) const {
 	return pwm->getPwmWrite();
 }
 
- void robot::Servo::relax() const {
+void robot::Servo::relax(){
 	setRawPwm(0);
 }
 
- void robot::Servo::setAngle(const double angle) const {
-	if (angle < 0) {
+void robot::Servo::setAngle(const double & angle){
+	if (angle < 0){
 		message("angle " << angle << " can't be less than zero. Pwm set to minPwm");
 		setRawPwm(minPwm);
-	} else if (angle > availAngle) {
+	}else if (angle > availAngle){
 		message("angle " << angle << " can't be more than availAngle. Pwm set to maxPwm");
 		setRawPwm(maxPwm);
-	} else {
+	}else{
 		setRawPwm(minPwm + (maxPwm - minPwm) * angle / availAngle);
 	}
 }
 
-robot::Servo::Servo(const Pin pwm_pin, const double start_pos,
-		const int min_pwm, const int max_pwm, const double avail_angle) {
+robot::Servo::Servo(const unsigned char pwm_pin, const double start_pos, const int min_pwm, const int max_pwm, const double avail_angle){
 	minPwm = min_pwm;
 	if (minPwm < 0){
 		minPwm = 0;
@@ -1680,22 +1419,19 @@ robot::Servo::Servo(const Pin pwm_pin, const double start_pos,
 		message("availDegr can't be less than zero. It set to zero");
 	}
 
-	pwm = new Pwm(pwm_pin, 0, 12499);
-	if (pwm == nullptr) {
+	pwm = new Pwm(pwm_pin, 0, 12500);
+	if (pwm == nullptr){
 		message("no memory for new Pwm pwm in Servo");
 		return;
 	}
 
-	if(start_pos >= 0) {
-		setAngle(start_pos);
-	} else {
-		relax();
-	}
+	if(start_pos >= 0) setAngle(start_pos);
+	else relax();
 }
 
-robot::Servo::~Servo() {
+robot::Servo::~Servo(){
 	relax();
-	if (pwm != nullptr) { delete pwm; }
+	if (pwm != nullptr) delete pwm;
 }
 
 #endif /* _ROBOT_CPP_ */
