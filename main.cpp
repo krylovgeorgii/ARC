@@ -1,3 +1,16 @@
+/* main.cpp
+ *
+ * example using button 
+ *
+ * Author: Krylov Georgii
+ *
+ * Contacts:
+ * 			krylov.georgii@gmail.com
+ * 			https://vk.com/krylov.georgii
+ * 			https://www.facebook.com/krylov.georgii
+ *
+ */
+
 #include "MyRIO/ButtonIRQ.h"
 #include <thread>
 #include "MyRIO/button.h"
