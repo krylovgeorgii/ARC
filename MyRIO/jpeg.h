@@ -3,9 +3,9 @@
  * Author: Krylov Georgii
  *
  * Contacts:
- * 			krylov.georgii@gmail.com
- * 			https://vk.com/krylov.georgii
- *      https://www.facebook.com/krylov.georgii
+ * 			  krylov.georgii@gmail.com
+ * 			  https://vk.com/krylov.georgii
+ * 			  https://www.facebook.com/krylov.georgii
  *
  */
 
