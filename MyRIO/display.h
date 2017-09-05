@@ -5,7 +5,7 @@
  * Contacts:
  * 			krylov.georgii@gmail.com
  * 			https://vk.com/krylov.georgii
- *          https://www.facebook.com/krylov.georgii
+ * 			https://www.facebook.com/krylov.georgii
  *
  */
 
