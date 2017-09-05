@@ -1,6 +1,6 @@
 # ARC
 
-main.cpp
+test_merged.cpp
 
 mobile robotics <br>
 for myRIO-1900(1950) controller from National Instruments <br>
@@ -20,7 +20,13 @@ use usb-camera YUV 4:2:2 format
 
 files by Krylov Georgii 2016-2017:
 
-main, test_vision, button, display, jpeg, log, pins, robot, time, type, vision
+test_vision, button, display, jpeg, log, pins, time, type, vision
+
+----
+
+files by Krylov Georgii & Ilyasov Alexander 2017:
+
+test_merged, robot
 
 ----
 
@@ -38,10 +44,10 @@ https://www.facebook.com/krylov.georgii
 
 ----
 
-examples of work programs based on this code:
+video of the work of this program:
+https://www.youtube.com/watch?v=2RZb8mG-ofw&pbjreload=10 <br>
+(World Robot Olimpiad 2017)
 
-World Robot Olimpiad 2017 <br>
-https://www.youtube.com/watch?v=2RZb8mG-ofw&pbjreload=10
-
-World Robot Olimpiad 2016 <br>
-https://www.youtube.com/watch?v=kecwOKwNBRU
+video of another program based on branch master:
+https://www.youtube.com/watch?v=kecwOKwNBRU <br>
+(World Robot Olimpiad 2016)
