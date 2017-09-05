@@ -1,3 +1,15 @@
+/* test_vision.cpp
+ *
+ * recognize tetracube 
+ *
+ * Author: Krylov Georgii
+ *
+ * Contacts:
+ * 			krylov.georgii@gmail.com
+ * 			https://vk.com/krylov.georgii
+ * 			https://www.facebook.com/krylov.georgii
+ *
+
 #include "MyRIO/vision.h"
 
 #define DISPLAY
