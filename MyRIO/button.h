@@ -1,8 +1,12 @@
-/*
- * button.h
+/* button.h
  *
- *  Created on: 24 апр. 2017 г.
- *      Author: root
+ * Author: Krylov Georgii
+ *
+ * Contacts:
+ * 			krylov.georgii@gmail.com
+ * 			https://vk.com/krylov.georgii
+ * 			https://www.facebook.com/krylov.georgii
+ *
  */
 
 #ifndef _BUTTON_H_
