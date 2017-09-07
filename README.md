@@ -8,6 +8,17 @@ read first lib MyRIO/vision
 
 ----
 
+examples of work programs based on this code:
+
+World Robot Olimpiad 2017 <br>
+https://www.youtube.com/watch?v=2RZb8mG-ofw&pbjreload=10 <br>
+(code in branch WRO2017)
+
+World Robot Olimpiad 2016 <br>
+https://www.youtube.com/watch?v=kecwOKwNBRU
+
+----
+
 main.cpp
 
 mobile robotics <br>
@@ -45,12 +56,3 @@ https://vk.com/krylov.georgii <br>
 https://www.facebook.com/krylov.georgii
 
 ----
-
-examples of work programs based on this code:
-
-World Robot Olimpiad 2017 <br>
-https://www.youtube.com/watch?v=2RZb8mG-ofw&pbjreload=10 <br>
-(code in branch WRO2017)
-
-World Robot Olimpiad 2016 <br>
-https://www.youtube.com/watch?v=kecwOKwNBRU
