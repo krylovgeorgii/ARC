@@ -1,5 +1,21 @@
 # ARC
 
+programm for World Robot Olimpiad 2017 <br>
+robot find tetracubes, recognize tham, take tetracubes and play tetris <br>
+rules http://www.wro2017.org/advancedCategory.html
+
+----
+
+video of the work of this program:
+https://www.youtube.com/watch?v=2RZb8mG-ofw&pbjreload=10 <br>
+(World Robot Olimpiad 2017)
+
+video of another program based on branch master:
+https://www.youtube.com/watch?v=kecwOKwNBRU <br>
+(World Robot Olimpiad 2016)
+
+----
+
 test_merged.cpp
 
 mobile robotics <br>
@@ -43,11 +59,3 @@ https://vk.com/krylov.georgii <br>
 https://www.facebook.com/krylov.georgii
 
 ----
-
-video of the work of this program:
-https://www.youtube.com/watch?v=2RZb8mG-ofw&pbjreload=10 <br>
-(World Robot Olimpiad 2017)
-
-video of another program based on branch master:
-https://www.youtube.com/watch?v=kecwOKwNBRU <br>
-(World Robot Olimpiad 2016)
