@@ -3,7 +3,8 @@
 libraries for convenient programming controller myRIO for mobile robotics with using motors and sensors <br>
 read first lib MyRIO/robot
 
-libraries for computer vision for any linux that recognize connectivity components of pixels by color using color cone <br>
+libraries for computer vision for any linux that recognize connectivity components of pixels by color <br>
+using Color-cone and Breadth-first search <br>
 read first lib MyRIO/vision
 
 ----
