@@ -1,9 +1,9 @@
 # ARC
 
-libraries for convenient programming controller myRIO for mobile robotics with using motors and sensors
+libraries for convenient programming controller myRIO for mobile robotics with using motors and sensors <br>
 read first lib MyRIO/robot
 
-libraries for computer vision for any linux that recognize connectivity components of pixels by color using color cone
+libraries for computer vision for any linux that recognize connectivity components of pixels by color using color cone <br>
 read first lib MyRIO/vision
 
 ----
